@@ -7,6 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --gruen: #0b7a4b;
@@ -422,7 +427,7 @@
         <p class="meldung" id="meldung" role="status"></p>
     </div>
 
-    <!-- Dialog: Anzeigename -->
+    <!-- Dialoge -->
     <dialog id="dlgAnzeigename">
         <div>
             <h3 class="orange-titel">Anzeigename festlegen</h3>
@@ -440,7 +445,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Verwalten (Accounts) -->
     <dialog id="dlgVerwalten" class="mittel">
         <div>
             <h3 class="orange-titel">Benutzer-Accounts verwalten &amp; anlegen</h3>
@@ -458,7 +462,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Login-PW zurücksetzen -->
     <dialog id="dlgPwReset">
         <div>
             <h3 class="orange-titel" id="pwResetTitel">Login-PW zurücksetzen</h3>
@@ -472,7 +475,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Gruppen verwalten -->
     <dialog id="dlgGruppenVerwalten" class="mittel">
         <div>
             <h3 class="orange-titel">Gruppen verwalten</h3>
@@ -490,7 +492,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Einlade-Code -->
     <dialog id="dlgEinladeCode">
         <div>
             <h3 class="orange-titel" id="einladeCodeTitel">Einlade-Code</h3>
@@ -508,7 +509,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Gruppe beitreten -->
     <dialog id="dlgGruppeBeitreten">
         <div>
             <h3 class="orange-titel">Gruppe beitreten</h3>
@@ -522,7 +522,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Neuer Einsatz -->
     <dialog id="dlgEinsatz">
         <div id="formEinsatz">
             <h3>Neuer Einsatz</h3>
@@ -538,7 +537,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Neuen Helfer erstellen -->
     <dialog id="dlgHelferNeu">
         <div>
             <h3>Neuen Helfer erstellen</h3>
@@ -554,7 +552,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Bestätigung -->
     <dialog id="dlgBestaetigung">
         <div>
             <h3 id="bestaetigungTitel">Bestätigung</h3>
@@ -566,7 +563,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Einsatz-Details -->
     <dialog id="dlgEinsatzDetail" class="breit">
         <div>
             <h3 id="detailTitel">Einsatz-Details</h3>
@@ -608,7 +604,6 @@
         </div>
     </dialog>
 
-    <!-- Dialog: Ausfüllformular -->
     <dialog id="dlgFormular" class="breit">
         <div>
             <div class="kein-druck" style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem;">
@@ -695,6 +690,13 @@
     </dialog>
 
     <script>
+        /* 
+          Falls du Firebase-Projektkonfigurationsdaten hast, kannst du sie hier initialisieren:
+          // TODO: Trage hier deine Firebase Web Config ein, falls gewünscht
+          // const firebaseConfig = { ... };
+          // firebase.initializeApp(firebaseConfig);
+        */
+
         var KONTEN_KEY = "lgsSchulsaniKonten";
         var GRUPPEN_KEY = "lgsSchulsaniGruppen";
         var LOGIN_KEY = "lgsSchulsaniAngemeldet";
@@ -836,7 +838,6 @@
             });
         }
 
-        // STRIKTE ISOLIERUNG: Administrator hat standardmäßig KEINE Sonderrechte in fremden Gruppen, es sei denn er ist Mitglied
         function istMitgliedInAktiverGruppe() {
             if (!aktuellerBenutzer) return false;
             if (aktiveGruppeId === "standard") return true;
@@ -849,7 +850,7 @@
         function kannInAktiverGruppeSchreiben() {
             if (!aktuellerBenutzer) return false;
             if (aktiveGruppeId === "standard") return hatSchreibrecht();
-            if (!istMitgliedInAktiverGruppe()) return false; // Strikte Barriere für Nicht-Mitglieder (inkl. edpadmin)
+            if (!istMitgliedInAktiverGruppe()) return false;
             var g = gruppenListe.find(function (item) { return item.id === aktiveGruppeId; });
             if (!g) return false;
             var u = aktuellerBenutzer.benutzer;
@@ -859,7 +860,7 @@
         function darfEinsätzeHinzufuegenInAktiverGruppe() {
             if (!aktuellerBenutzer) return false;
             if (aktiveGruppeId === "standard") return hatSchreibrecht();
-            if (!istMitgliedInAktiverGruppe()) return false; // Strikte Barriere für Nicht-Mitglieder (inkl. edpadmin)
+            if (!istMitgliedInAktiverGruppe()) return false;
             var g = gruppenListe.find(function (item) { return item.id === aktiveGruppeId; });
             if (!g) return false;
             var u = aktuellerBenutzer.benutzer;
@@ -882,7 +883,6 @@
             $("neuerHelferBtn").hidden = !kannInAktiverGruppeSchreiben();
         }
 
-        // Nur Gruppen anzeigen, in denen der Benutzer tatsächlich Mitglied ist (oder globaler Admin für Standard)
         function getVerfuegbareGruppenFuerUser() {
             if (!aktuellerBenutzer) return [];
             var u = aktuellerBenutzer.benutzer;
@@ -997,7 +997,6 @@
             daten = { laufend: [], archiv: [] };
             helferListe = [];
 
-            // Sicherheitsprüfung: Wenn keine Mitgliedschaft in der aktiven Gruppe vorliegt, Daten blockieren!
             if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
                 anzeigen();
                 return;
@@ -1798,7 +1797,6 @@
         }
 
         function anzeigen() {
-            // Wenn keine Mitgliedschaft vorliegt, leere Daten anzeigen
             if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
                 $("zaehlerEinsaetze").textContent = "0";
                 $("zahlLaufend").textContent = "0";
@@ -2358,7 +2356,7 @@
             if (!treffer) {
                 $("fehler").textContent = "Benutzername oder Passwort falsch.";
                 $("passwort").value = "";
-                $("passwort.focus()");
+                $("passwort").focus();
                 return;
             }
             loginSetzen(benutzer, $("angemeldetBleiben").checked);
