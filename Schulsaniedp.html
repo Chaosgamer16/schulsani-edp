@@ -41,7 +41,6 @@
         body.dunkel { background: var(--d-grund); color: var(--d-text); }
         [hidden] { display: none !important; }
 
-        /* ---------- Login (Mobile First) ---------- */
         .seite { min-height: 100%; display: grid; grid-template-columns: 5fr 6fr; }
         .marke {
             background: var(--d-flaeche); color: var(--d-text); border-right: 1px solid var(--d-linie);
@@ -62,7 +61,7 @@
         input[type="text"], input[type="password"] {
             width: 100%; font: inherit; padding: .8rem .85rem; margin-bottom: 1.1rem;
             border: 1px solid var(--d-linie); border-radius: 6px; background: #1b1b1b; color: var(--d-text);
-            font-size: 16px; /* Verhindert automatisches Zoom auf iPhones */
+            font-size: 16px;
         }
         input:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
             outline: 3px solid #5aa9ff; outline-offset: 2px;
@@ -82,7 +81,6 @@
         .knopf:hover { background: var(--rot-dunkel); }
         .fehler { min-height: 1.5rem; margin: 0 0 .75rem; color: #ff7b72; font-weight: 700; font-size: .9rem; }
 
-        /* ---------- Hauptmenü & Responsive Layout ---------- */
         .haupt { padding: 1rem clamp(0.75rem, 3vw, 2rem) 3rem; max-width: 1400px; margin: 0 auto; width: 100%; }
         .kopf { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
         .kopf h1 { margin: 0; font-size: clamp(1.3rem, 3vw, 1.6rem); }
@@ -152,7 +150,6 @@
         .einsatz-aktionen { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .3rem; justify-content: flex-start; }
         .meldung { margin-top: 1rem; color: var(--d-grau); font-size: .88rem; min-height: 1.3rem; }
 
-        /* ---------- Gruppen-Leiste ---------- */
         .gruppen-leiste {
             display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
             background: #232323; border: 1px solid var(--d-linie); border-radius: 6px;
@@ -163,7 +160,6 @@
             color: var(--d-text); border: 1px solid var(--d-linie); border-radius: 6px; flex: 1; min-width: 140px; font-size: 16px;
         }
 
-        /* ---------- Helfererfassung ---------- */
         .helfer-karte {
             display: flex; justify-content: space-between; align-items: center; gap: .75rem;
             padding: .7rem .85rem; border-top: 1px solid var(--d-linie); flex-wrap: wrap;
@@ -194,7 +190,6 @@
         }
         .btn-minus:hover { background: var(--rot-dunkel); }
 
-        /* ---------- Dialoge (Mobil optimiert) ---------- */
         dialog {
             background: var(--d-flaeche); color: var(--d-text); border: 1px solid var(--d-linie);
             border-radius: 8px; padding: 1.25rem; width: 95vw; max-width: 520px; max-height: 90vh; overflow-y: auto;
@@ -269,7 +264,6 @@
             font-size: .8rem; font-weight: 700; margin-bottom: .6rem;
         }
 
-        /* ---------- Ausfüllformular (Druckbar) ---------- */
         .formular-blatt {
             background: #1e1e1e; border: 1px solid var(--d-linie); border-radius: 6px;
             padding: .85rem; margin-top: .4rem;
@@ -842,24 +836,36 @@
             });
         }
 
+        // STRIKTE ISOLIERUNG: Administrator hat standardmäßig KEINE Sonderrechte in fremden Gruppen, es sei denn er ist Mitglied
+        function istMitgliedInAktiverGruppe() {
+            if (!aktuellerBenutzer) return false;
+            if (aktiveGruppeId === "standard") return true;
+            var g = gruppenListe.find(function (item) { return item.id === aktiveGruppeId; });
+            if (!g) return false;
+            var u = aktuellerBenutzer.benutzer;
+            return (g.mitglieder && g.mitglieder.indexOf(u) !== -1) || g.besitzer === u;
+        }
+
         function kannInAktiverGruppeSchreiben() {
             if (!aktuellerBenutzer) return false;
             if (aktiveGruppeId === "standard") return hatSchreibrecht();
+            if (!istMitgliedInAktiverGruppe()) return false; // Strikte Barriere für Nicht-Mitglieder (inkl. edpadmin)
             var g = gruppenListe.find(function (item) { return item.id === aktiveGruppeId; });
-            if (!g) return hatSchreibrecht();
+            if (!g) return false;
             var u = aktuellerBenutzer.benutzer;
-            return istAdmin() || hatSchreibrecht() || g.besitzer === u || (g.delegierte && g.delegierte.indexOf(u) !== -1);
+            return hatSchreibrecht() || g.besitzer === u || (g.delegierte && g.delegierte.indexOf(u) !== -1) || (g.mitglieder && g.mitglieder.indexOf(u) !== -1);
         }
 
         function darfEinsätzeHinzufuegenInAktiverGruppe() {
             if (!aktuellerBenutzer) return false;
             if (aktiveGruppeId === "standard") return hatSchreibrecht();
+            if (!istMitgliedInAktiverGruppe()) return false; // Strikte Barriere für Nicht-Mitglieder (inkl. edpadmin)
             var g = gruppenListe.find(function (item) { return item.id === aktiveGruppeId; });
-            if (!g) return hatSchreibrecht();
+            if (!g) return false;
             var u = aktuellerBenutzer.benutzer;
-            if (istAdmin() || hatSchreibrecht() || g.besitzer === u) return true;
+            if (g.besitzer === u) return true;
             if (g.einsatzBerechtigte && g.einsatzBerechtigte.indexOf(u) !== -1) return true;
-            return false;
+            return hatSchreibrecht() || (g.mitglieder && g.mitglieder.indexOf(u) !== -1);
         }
 
         function aktualisiereKopfButtons() {
@@ -876,11 +882,12 @@
             $("neuerHelferBtn").hidden = !kannInAktiverGruppeSchreiben();
         }
 
+        // Nur Gruppen anzeigen, in denen der Benutzer tatsächlich Mitglied ist (oder globaler Admin für Standard)
         function getVerfuegbareGruppenFuerUser() {
             if (!aktuellerBenutzer) return [];
             var u = aktuellerBenutzer.benutzer;
             return gruppenListe.filter(function (g) {
-                return istAdmin() || g.besitzer === u || (g.mitglieder && g.mitglieder.indexOf(u) !== -1);
+                return g.besitzer === u || (g.mitglieder && g.mitglieder.indexOf(u) !== -1);
             });
         }
 
@@ -889,12 +896,6 @@
             var leiste = $("gruppenLeiste");
             var sel = $("aktiveGruppeSelect");
             var btnVerlassen = $("btnGruppeVerlassen");
-
-            if (!verfuegbar.length) {
-                leiste.hidden = true;
-                aktiveGruppeId = "standard";
-                return;
-            }
 
             leiste.hidden = false;
             sel.textContent = "";
@@ -995,6 +996,13 @@
         function datenLaden() {
             daten = { laufend: [], archiv: [] };
             helferListe = [];
+
+            // Sicherheitsprüfung: Wenn keine Mitgliedschaft in der aktiven Gruppe vorliegt, Daten blockieren!
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
+                anzeigen();
+                return;
+            }
+
             try {
                 var roh = localStorage.getItem(getDatenStorageKey());
                 if (roh) { daten = JSON.parse(roh); }
@@ -1012,10 +1020,12 @@
         }
 
         function datenSpeichern() {
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
             try { localStorage.setItem(getDatenStorageKey(), JSON.stringify(daten)); } catch (e) {}
         }
 
         function helferSpeichern() {
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
             try { localStorage.setItem(getHelferStorageKey(), JSON.stringify(helferListe)); } catch (e) {}
         }
 
@@ -1287,20 +1297,19 @@
             var u = aktuellerBenutzer.benutzer;
 
             var sichtbareGruppen = gruppenListe.filter(function (g) {
-                return istAdmin() || g.besitzer === u || (g.delegierte && g.delegierte.indexOf(u) !== -1);
+                return g.besitzer === u || (g.delegierte && g.delegierte.indexOf(u) !== -1);
             });
 
             if (!sichtbareGruppen.length) {
                 var p = document.createElement("p");
                 p.className = "leer";
-                p.textContent = "Keine Gruppen vorhanden.";
+                p.textContent = "Keine eigenen Gruppen vorhanden.";
                 ziel.appendChild(p);
                 return;
             }
 
             sichtbareGruppen.forEach(function (g) {
-                var istBesitzer = (g.besitzer === u || istAdmin());
-                var istDelegiert = (g.delegierte && g.delegierte.indexOf(u) !== -1);
+                var istBesitzer = (g.besitzer === u);
 
                 var karte = document.createElement("div");
                 karte.className = "admin-karte";
@@ -1321,7 +1330,7 @@
 
                 var rolleBadge = document.createElement("span");
                 rolleBadge.className = istBesitzer ? "admin-badge" : "gruppen-badge";
-                rolleBadge.textContent = g.besitzer === u ? "Besitzer" : "Verwalter";
+                rolleBadge.textContent = istBesitzer ? "Besitzer" : "Verwalter";
                 links.appendChild(rolleBadge);
 
                 kopf.appendChild(links);
@@ -1436,7 +1445,7 @@
 
         function toggleGruppenBerechtigung(gruppeId, mitglied) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
-            if (!g || (g.besitzer !== aktuellerBenutzer.benutzer && !istAdmin())) return;
+            if (!g || g.besitzer !== aktuellerBenutzer.benutzer) return;
 
             if (!g.delegierte) g.delegierte = [];
             var idx = g.delegierte.indexOf(mitglied);
@@ -1448,7 +1457,7 @@
 
         function toggleEinsatzBerechtigung(gruppeId, mitglied) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
-            if (!g || (g.besitzer !== aktuellerBenutzer.benutzer && !istAdmin())) return;
+            if (!g || g.besitzer !== aktuellerBenutzer.benutzer) return;
 
             if (!g.einsatzBerechtigte) g.einsatzBerechtigte = [];
             var idx = g.einsatzBerechtigte.indexOf(mitglied);
@@ -1789,6 +1798,20 @@
         }
 
         function anzeigen() {
+            // Wenn keine Mitgliedschaft vorliegt, leere Daten anzeigen
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
+                $("zaehlerEinsaetze").textContent = "0";
+                $("zahlLaufend").textContent = "0";
+                $("zaehlerArchiv").textContent = "0";
+                $("zahlArchiv").textContent = "0";
+                $("zaehlerHelfer").textContent = "0";
+                $("zahlHelferListe").textContent = "0";
+                $("listeLaufend").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
+                $("listeArchiv").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
+                $("listeHelferGlobal").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
+                return;
+            }
+
             var n = daten.laufend.length, a = daten.archiv.length;
             $("zaehlerEinsaetze").textContent = n;
             $("zahlLaufend").textContent = n;
@@ -2335,7 +2358,7 @@
             if (!treffer) {
                 $("fehler").textContent = "Benutzername oder Passwort falsch.";
                 $("passwort").value = "";
-                $("passwort").focus();
+                $("passwort.focus()");
                 return;
             }
             loginSetzen(benutzer, $("angemeldetBleiben").checked);
