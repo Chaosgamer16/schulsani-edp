@@ -24,7 +24,7 @@
             --weiss: #ffffff;
             --rot: #d62828;
             --rot-dunkel: #b21c1c;
-            --helles-rot: #ff6b6b; /* Sehr helles Rot für den HLW-Ton Button */
+            --helles-rot: #ff6b6b;
             --helles-rot-hover: #ff5252;
             --orange: #f57c00;
             --blau: #1976d2;
@@ -132,18 +132,8 @@
         .kachel:hover { background: #474747; }
         .kachel.aktiv { background: var(--rot-dunkel); border-color: #d33; }
         .kachel.aktiv:hover { background: #c42222; }
-        
-        /* Spezieller Stil für die HLW-Ton Kachel mit sehr hellem Rot */
-        .kachel.hlw-ton {
-            background: var(--helles-rot);
-            color: #111111;
-            border-color: #ff9999;
-            font-weight: 700;
-        }
-        .kachel.hlw-ton:hover {
-            background: var(--helles-rot-hover);
-        }
-
+        .kachel.hlw-ton { background: var(--helles-rot); color: #111111; border-color: #ff9999; font-weight: 700; }
+        .kachel.hlw-ton:hover { background: var(--helles-rot-hover); }
         .kachel svg { width: 22px; height: 22px; fill: currentColor; }
         .zaehler { position: absolute; top: 5px; right: 8px; font-size: .7rem; font-weight: 700; }
 
@@ -402,7 +392,6 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z"/></svg>
                 Archiv
             </button>
-            <!-- Neuer HLW-Ton Button mit sehr hellem Rot und externem Link -->
             <a href="https://theonlinemetronome.com/metronome/120-bpm" target="_blank" rel="noopener noreferrer" class="kachel hlw-ton">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
                 HLW-Ton
@@ -709,7 +698,6 @@
     </dialog>
 
     <script>
-        // Firebase Initialisierung mit deinen echten Config-Daten
         const firebaseConfig = {
             apiKey: "AIzaSyDrFFjONjZLBpxA3SNMiFjvpnb6BKe6uIU",
             authDomain: "schulsani-edp.firebaseapp.com",
@@ -753,25 +741,22 @@
 
         async function systemDatenLaden() {
             try {
-                // Konten aus Firestore laden
                 const kSnap = await db.collection("system").doc("konten").get();
                 if (kSnap.exists && kSnap.data().liste) {
                     kontenListe = kSnap.data().liste;
                 } else {
                     kontenListe = [
-                        { benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true }
+                        { benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true, erstelltVon: "system" }
                     ];
                     await systemDatenSpeichern();
                 }
 
-                // Admin-Fallback sicherstellen
                 var admin = kontenListe.find(function (k) { return k.benutzer === "edpadmin"; });
                 if (!admin) {
-                    kontenListe.unshift({ benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true });
+                    kontenListe.unshift({ benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true, erstelltVon: "system" });
                     await systemDatenSpeichern();
                 }
 
-                // Gruppen aus Firestore laden
                 const gSnap = await db.collection("system").doc("gruppen").get();
                 if (gSnap.exists && gSnap.data().liste) {
                     gruppenListe = gSnap.data().liste;
@@ -1149,7 +1134,14 @@
                 return;
             }
 
-            kontenListe.push({ benutzer: benutzer, passwort: passwort, isAdmin: false, canEdit: canEdit });
+            // Account mit Speicherung des Erstellers, damit nicht-Admin nur eigene Accounts sieht
+            kontenListe.push({ 
+                benutzer: benutzer, 
+                passwort: passwort, 
+                isAdmin: false, 
+                canEdit: canEdit, 
+                erstelltVon: aktuellerBenutzer.benutzer 
+            });
             await systemDatenSpeichern();
 
             $("neuAccBenutzer").value = "";
@@ -1163,7 +1155,24 @@
             var ziel = $("listeVorhandeneAccounts");
             ziel.textContent = "";
 
-            kontenListe.forEach(function (acc) {
+            var anzeigbareAccounts = kontenListe;
+            // Wenn der User weder Admin noch EDP-Admin ist, darf er NUR von ihm selbst erstellte Accounts sehen!
+            if (!istAdmin()) {
+                var u = aktuellerBenutzer.benutzer;
+                anzeigbareAccounts = kontenListe.filter(function (acc) {
+                    return acc.erstelltVon === u;
+                });
+            }
+
+            if (!anzeigbareAccounts.length) {
+                var p = document.createElement("p");
+                p.className = "leer";
+                p.textContent = "Keine von dir erstellten Accounts vorhanden.";
+                ziel.appendChild(p);
+                return;
+            }
+
+            anzeigbareAccounts.forEach(function (acc) {
                 var karte = document.createElement("div");
                 karte.className = "admin-karte";
 
@@ -1363,13 +1372,28 @@
 
                 kopf.appendChild(links);
 
+                var aktionenOben = document.createElement("div");
+                aktionenOben.style.display = "flex";
+                aktionenOben.style.gap = ".4rem";
+
                 var btnEinladen = document.createElement("button");
                 btnEinladen.type = "button";
                 btnEinladen.className = "btn-orange";
                 btnEinladen.textContent = "Code";
                 btnEinladen.addEventListener("click", function () { oeffneEinladeCodeDialog(g.id); });
-                kopf.appendChild(btnEinladen);
+                aktionenOben.appendChild(btnEinladen);
 
+                // Neuer Button: Gruppe löschen (nur für den Besitzer sichtbar)
+                if (istBesitzer) {
+                    var btnGruppeLoeschen = document.createElement("button");
+                    btnGruppeLoeschen.type = "button";
+                    btnGruppeLoeschen.className = "btn-gefahr";
+                    btnGruppeLoeschen.textContent = "Gruppe löschen";
+                    btnGruppeLoeschen.addEventListener("click", function () { gruppeLoeschenFragen(g.id); });
+                    aktionenOben.appendChild(btnGruppeLoeschen);
+                }
+
+                kopf.appendChild(aktionenOben);
                 karte.appendChild(kopf);
 
                 var mitgliederBox = document.createElement("div");
@@ -1467,6 +1491,43 @@
                 karte.appendChild(mitgliederBox);
                 ziel.appendChild(karte);
             });
+        }
+
+        function gruppeLoeschenFragen(gruppeId) {
+            var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
+            if (!g || g.besitzer !== aktuellerBenutzer.benutzer) return;
+
+            frageBestaetigung(
+                "Gruppe löschen?",
+                "Möchtest du die Gruppe \"" + g.name + "\" und alle zugehörigen Einsätze & Helfer wirklich unwiderruflich löschen?",
+                "Gruppe löschen",
+                "btn-rot",
+                async function () {
+                    // Aus der Gruppenliste entfernen
+                    gruppenListe = gruppenListe.filter(function (item) { return item.id !== gruppeId; });
+                    await systemDatenSpeichern();
+
+                    // Zugehörige Einsätze und Helfer in Firestore löschen
+                    try {
+                        await db.collection("einsaetze").doc("grp_" + gruppeId).delete();
+                        await db.collection("helfer").doc("grp_" + gruppeId).delete();
+                    } catch (e) {
+                        console.error("Fehler beim Löschen der Gruppen-Daten in Firestore:", e);
+                    }
+
+                    // Auf Standard-Gruppe zurücksetzen falls aktiv
+                    if (aktiveGruppeId === gruppeId) {
+                        aktiveGruppeId = "standard";
+                        try { localStorage.setItem(AKTIVE_GRUPPE_KEY + "_" + aktuellerBenutzer.benutzer, "standard"); } catch (e) {}
+                    }
+
+                    renderVerwalteteGruppenListe();
+                    aktualisiereGruppenLeiste();
+                    aktualisiereKopfButtons();
+                    await datenLaden();
+                    meldung("Gruppe wurde gelöscht.");
+                }
+            );
         }
 
         async function toggleGruppenBerechtigung(gruppeId, mitglied) {
