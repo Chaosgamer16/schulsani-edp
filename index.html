@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Schulsani-EDP</title>
+    <title>LGS-Schulsani-EDP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (Compat v10) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -690,18 +690,20 @@
     </dialog>
 
     <script>
-        /* 
-          Falls du Firebase-Projektkonfigurationsdaten hast, kannst du sie hier initialisieren:
-          // TODO: Trage hier deine Firebase Web Config ein, falls gewünscht
-          // const firebaseConfig = { ... };
-          // firebase.initializeApp(firebaseConfig);
-        */
+        // Firebase Initialisierung mit deinen echten Config-Daten
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrFFjONjZLBpxA3SNMiFjvpnb6BKe6uIU",
+            authDomain: "schulsani-edp.firebaseapp.com",
+            projectId: "schulsani-edp",
+            storageBucket: "schulsani-edp.firebasestorage.app",
+            messagingSenderId: "712424814720",
+            appId: "1:712424814720:web:ed3802df7ba273ba9a0e65",
+            measurementId: "G-LKN15WZLS4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        var KONTEN_KEY = "lgsSchulsaniKonten";
-        var GRUPPEN_KEY = "lgsSchulsaniGruppen";
         var LOGIN_KEY = "lgsSchulsaniAngemeldet";
-        var DATEN_KEY = "lgsSchulsaniEinsaetze";
-        var HELFER_KEY = "lgsSchulsaniHelfer";
         var AKTIVE_GRUPPE_KEY = "lgsSchulsaniAktiveGruppe";
         var ANZEIGENAMEN_KEY = "lgsSchulsaniAnzeigenamen";
         var NAMENS_SPERRE_KEY = "lgsSchulsaniNamensSperre";
@@ -717,6 +719,9 @@
         var aktuellerBenutzer = null;
         var aktiveGruppeId = "standard";
 
+        var daten = { laufend: [], archiv: [] };
+        var helferListe = [];
+
         var aktiverDetailEinsatzId = null;
         var aktiverFormularEinsatzId = null;
         var timerInterval = null;
@@ -725,39 +730,105 @@
         var pwResetZielUser = null;
         var einladeCodeGruppeId = null;
 
-        function systemDatenLaden() {
+        // --- FIRESTORE DATEN-SYNCHRONISATION ---
+
+        async function systemDatenLaden() {
             try {
-                var kRoh = localStorage.getItem(KONTEN_KEY);
-                if (kRoh) kontenListe = JSON.parse(kRoh);
-            } catch (e) {}
-            if (!Array.isArray(kontenListe) || !kontenListe.length) {
-                kontenListe = [
-                    { benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true }
-                ];
-                systemDatenSpeichern();
-            } else {
+                // Konten aus Firestore laden
+                const kSnap = await db.collection("system").doc("konten").get();
+                if (kSnap.exists && kSnap.data().liste) {
+                    kontenListe = kSnap.data().liste;
+                } else {
+                    kontenListe = [
+                        { benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true }
+                    ];
+                    await systemDatenSpeichern();
+                }
+
+                // Admin-Fallback sicherstellen
                 var admin = kontenListe.find(function (k) { return k.benutzer === "edpadmin"; });
                 if (!admin) {
                     kontenListe.unshift({ benutzer: "edpadmin", passwort: "mariie.192", isAdmin: true, canEdit: true });
-                } else {
-                    admin.isAdmin = true;
-                    admin.canEdit = true;
+                    await systemDatenSpeichern();
                 }
+
+                // Gruppen aus Firestore laden
+                const gSnap = await db.collection("system").doc("gruppen").get();
+                if (gSnap.exists && gSnap.data().liste) {
+                    gruppenListe = gSnap.data().liste;
+                } else {
+                    gruppenListe = [];
+                }
+            } catch (e) {
+                console.error("Fehler beim Laden der Systemdaten aus Firebase:", e);
+            }
+        }
+
+        async function systemDatenSpeichern() {
+            try {
+                await db.collection("system").doc("konten").set({ liste: kontenListe });
+                await db.collection("system").doc("gruppen").set({ liste: gruppenListe });
+            } catch (e) {
+                console.error("Fehler beim Speichern der Systemdaten in Firebase:", e);
+            }
+        }
+
+        async function datenLaden() {
+            daten = { laufend: [], archiv: [] };
+            helferListe = [];
+
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
+                anzeigen();
+                return;
             }
 
             try {
-                var gRoh = localStorage.getItem(GRUPPEN_KEY);
-                if (gRoh) gruppenListe = JSON.parse(gRoh);
-            } catch (e) {}
-            if (!Array.isArray(gruppenListe)) gruppenListe = [];
+                const docId = aktiveGruppeId === "standard" ? "standard_daten" : "grp_" + aktiveGruppeId;
+                const dSnap = await db.collection("einsaetze").doc(docId).get();
+                if (dSnap.exists) {
+                    var dData = dSnap.data();
+                    daten.laufend = dData.laufend || [];
+                    daten.archiv = dData.archiv || [];
+                }
+
+                const hSnap = await db.collection("helfer").doc(docId).get();
+                if (hSnap.exists) {
+                    helferListe = hSnap.data().liste || [];
+                }
+            } catch (e) {
+                console.error("Fehler beim Laden der Einsätze/Helfer:", e);
+            }
+
+            abgelaufeneFormulareBereinigen();
+            anzeigen();
         }
 
-        function systemDatenSpeichern() {
+        async function datenSpeichern() {
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
             try {
-                localStorage.setItem(KONTEN_KEY, JSON.stringify(kontenListe));
-                localStorage.setItem(GRUPPEN_KEY, JSON.stringify(gruppenListe));
-            } catch (e) {}
+                const docId = aktiveGruppeId === "standard" ? "standard_daten" : "grp_" + aktiveGruppeId;
+                await db.collection("einsaetze").doc(docId).set({
+                    laufend: daten.laufend,
+                    archiv: daten.archiv
+                });
+            } catch (e) {
+                console.error("Fehler beim Speichern der Einsätze:", e);
+            }
         }
+
+        async function helferSpeichern() {
+            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
+            try {
+                const docId = aktiveGruppeId === "standard" ? "standard_daten" : "grp_" + aktiveGruppeId;
+                await db.collection("helfer").doc(docId).set({
+                    liste: helferListe
+                });
+            } catch (e) {
+                console.error("Fehler beim Speichern der Helfer:", e);
+            }
+        }
+
+        // --- AUTH & LOGIN LOGIK ---
 
         function loginLesen() {
             try { return localStorage.getItem(LOGIN_KEY) || sessionStorage.getItem(LOGIN_KEY); }
@@ -789,16 +860,11 @@
             }
         }
 
-        function synchronisiereSystemHelfer(neuerName) {
+        async function synchronisiereSystemHelfer(neuerName) {
             if (!aktuellerBenutzer || aktiveGruppeId === "standard") return;
-            var hKey = HELFER_KEY + "_grp_" + aktiveGruppeId;
-            var hList = [];
-            try {
-                hList = JSON.parse(localStorage.getItem(hKey) || "[]");
-            } catch (e) {}
-
+            
             var u = aktuellerBenutzer.benutzer;
-            var sysHelfer = hList.find(function (h) { return h.creatorUser === u && h.istSystemHelfer; });
+            var sysHelfer = helferListe.find(function (h) { return h.creatorUser === u && h.istSystemHelfer; });
             
             var teile = neuerName.split(",");
             var nachname = teile[0] ? teile[0].trim() : neuerName;
@@ -808,7 +874,7 @@
                 sysHelfer.nachname = nachname;
                 sysHelfer.vorname = vorname;
             } else {
-                hList.push({
+                helferListe.push({
                     id: "h_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
                     nachname: nachname,
                     vorname: vorname,
@@ -816,9 +882,7 @@
                     istSystemHelfer: true
                 });
             }
-            try {
-                localStorage.setItem(hKey, JSON.stringify(hList));
-            } catch (e) {}
+            await helferSpeichern();
         }
 
         function istAdmin() {
@@ -937,13 +1001,12 @@
             }
         }
 
-        $("aktiveGruppeSelect").addEventListener("change", function () {
+        $("aktiveGruppeSelect").addEventListener("change", async function () {
             aktiveGruppeId = this.value;
             try { localStorage.setItem(AKTIVE_GRUPPE_KEY + "_" + aktuellerBenutzer.benutzer, aktiveGruppeId); } catch (e) {}
             aktualisiereGruppenLeiste();
             aktualisiereKopfButtons();
-            datenLaden();
-            anzeigen();
+            await datenLaden();
         });
 
         $("btnGruppeVerlassen").addEventListener("click", function () {
@@ -956,86 +1019,34 @@
                 "Möchtest du die Gruppe \"" + g.name + "\" wirklich verlassen?",
                 "Ja, verlassen",
                 "btn-rot",
-                function () {
+                async function () {
                     var u = aktuellerBenutzer.benutzer;
                     if (g.mitglieder) g.mitglieder = g.mitglieder.filter(function (m) { return m !== u; });
                     if (g.delegierte) g.delegierte = g.delegierte.filter(function (d) { return d !== u; });
                     if (g.einsatzBerechtigte) g.einsatzBerechtigte = g.einsatzBerechtigte.filter(function (e) { return e !== u; });
 
-                    var hKey = HELFER_KEY + "_grp_" + g.id;
-                    try {
-                        var hList = JSON.parse(localStorage.getItem(hKey) || "[]");
+                    // Helfer aus der Gruppe für diesen User löschen
+                    const hRef = db.collection("helfer").doc("grp_" + g.id);
+                    const hSnap = await hRef.get();
+                    if (hSnap.exists) {
+                        let hList = hSnap.data().liste || [];
                         hList = hList.filter(function (h) { return h.creatorUser !== u; });
-                        localStorage.setItem(hKey, JSON.stringify(hList));
-                    } catch (e) {}
+                        await hRef.set({ liste: hList });
+                    }
 
-                    systemDatenSpeichern();
+                    await systemDatenSpeichern();
                     aktiveGruppeId = "standard";
                     try { localStorage.setItem(AKTIVE_GRUPPE_KEY + "_" + u, "standard"); } catch (e) {}
 
                     aktualisiereGruppenLeiste();
                     aktualisiereKopfButtons();
-                    datenLaden();
-                    anzeigen();
+                    await datenLaden();
                     meldung("Du hast die Gruppe verlassen.");
                 }
             );
         });
 
-        function getDatenStorageKey() {
-            return aktiveGruppeId === "standard" ? DATEN_KEY : (DATEN_KEY + "_grp_" + aktiveGruppeId);
-        }
-
-        function getHelferStorageKey() {
-            return aktiveGruppeId === "standard" ? HELFER_KEY : (HELFER_KEY + "_grp_" + aktiveGruppeId);
-        }
-
-        var daten = { laufend: [], archiv: [] };
-        var helferListe = [];
-
-        function datenLaden() {
-            daten = { laufend: [], archiv: [] };
-            helferListe = [];
-
-            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
-                anzeigen();
-                return;
-            }
-
-            try {
-                var roh = localStorage.getItem(getDatenStorageKey());
-                if (roh) { daten = JSON.parse(roh); }
-            } catch (e) {}
-            if (!daten.laufend) daten.laufend = [];
-            if (!daten.archiv) daten.archiv = [];
-
-            try {
-                var hRoh = localStorage.getItem(getHelferStorageKey());
-                if (hRoh) { helferListe = JSON.parse(hRoh); }
-            } catch (e) {}
-            if (!Array.isArray(helferListe)) helferListe = [];
-
-            abgelaufeneFormulareBereinigen();
-        }
-
-        function datenSpeichern() {
-            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
-            try { localStorage.setItem(getDatenStorageKey(), JSON.stringify(daten)); } catch (e) {}
-        }
-
-        function helferSpeichern() {
-            if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) return;
-            try { localStorage.setItem(getHelferStorageKey(), JSON.stringify(helferListe)); } catch (e) {}
-        }
-
-        function findeEinsatz(id) {
-            return daten.laufend.find(function (e) { return e.id === id; }) ||
-                   daten.archiv.find(function (e) { return e.id === id; }) || null;
-        }
-
-        function istEinsatzBeendet(id) {
-            return daten.archiv.some(function (e) { return e.id === id; });
-        }
+        // --- UI & DIALOG EVENT HANDLER ---
 
         $("btnAnzeigename").addEventListener("click", function () {
             if (aktiveGruppeId === "standard") return;
@@ -1072,7 +1083,7 @@
             $("dlgAnzeigename").close();
         });
 
-        $("btnAnzeigenameSpeichern").addEventListener("click", function () {
+        $("btnAnzeigenameSpeichern").addEventListener("click", async function () {
             var neuerName = $("inputAnzeigename").value.trim();
             if (!neuerName) {
                 $("anzeigenameFehler").textContent = "Bitte Namen eingeben.";
@@ -1084,7 +1095,7 @@
                 localStorage.setItem(getNamensSperreSpeicherKey(), Date.now().toString());
             } catch (e) {}
 
-            synchronisiereSystemHelfer(neuerName);
+            await synchronisiereSystemHelfer(neuerName);
             $("dlgAnzeigename").close();
             aktualisiereKopfButtons();
             anzeigen();
@@ -1105,7 +1116,7 @@
             $("dlgVerwalten").close();
         });
 
-        $("btnAccountErstellen").addEventListener("click", function () {
+        $("btnAccountErstellen").addEventListener("click", async function () {
             if (!hatSchreibrecht()) return;
             var benutzer = $("neuAccBenutzer").value.trim();
             var passwort = $("neuAccPasswort").value.trim();
@@ -1121,7 +1132,7 @@
             }
 
             kontenListe.push({ benutzer: benutzer, passwort: passwort, isAdmin: false, canEdit: canEdit });
-            systemDatenSpeichern();
+            await systemDatenSpeichern();
 
             $("neuAccBenutzer").value = "";
             $("neuAccPasswort").value = "";
@@ -1200,7 +1211,7 @@
             $("dlgPwReset").close();
         });
 
-        $("pwResetSpeichern").addEventListener("click", function () {
+        $("pwResetSpeichern").addEventListener("click", async function () {
             var neuesPw = $("pwResetNeu").value.trim();
             if (!neuesPw) {
                 $("pwResetFehler").textContent = "Neues Passwort eingeben.";
@@ -1209,7 +1220,7 @@
             var acc = kontenListe.find(function (k) { return k.benutzer === pwResetZielUser; });
             if (acc) {
                 acc.passwort = neuesPw;
-                systemDatenSpeichern();
+                await systemDatenSpeichern();
                 meldung("Passwort aktualisiert.");
             }
             pwResetZielUser = null;
@@ -1222,14 +1233,14 @@
                 "Account \"" + benutzer + "\" wirklich löschen?",
                 "Löschen",
                 "btn-rot",
-                function () {
+                async function () {
                     kontenListe = kontenListe.filter(function (k) { return k.benutzer !== benutzer; });
                     gruppenListe.forEach(function (g) {
                         if (g.mitglieder) g.mitglieder = g.mitglieder.filter(function (m) { return m !== benutzer; });
                         if (g.delegierte) g.delegierte = g.delegierte.filter(function (d) { return d !== benutzer; });
                         if (g.einsatzBerechtigte) g.einsatzBerechtigte = g.einsatzBerechtigte.filter(function (e) { return e !== benutzer; });
                     });
-                    systemDatenSpeichern();
+                    await systemDatenSpeichern();
                     renderAccountsListe();
                     meldung("Account gelöscht.");
                 }
@@ -1258,7 +1269,7 @@
             $("dlgGruppenVerwalten").close();
         });
 
-        $("btnGruppeErstellen").addEventListener("click", function () {
+        $("btnGruppeErstellen").addEventListener("click", async function () {
             if (!hatSchreibrecht()) return;
             var name = $("neueGruppeName").value.trim();
             if (!name) {
@@ -1279,8 +1290,8 @@
                 codeErstelltAm: Date.now()
             };
             gruppenListe.push(neueGruppe);
-            systemDatenSpeichern();
-            synchronisiereSystemHelfer(u);
+            await systemDatenSpeichern();
+            await synchronisiereSystemHelfer(u);
 
             $("neueGruppeName").value = "";
             $("gruppeErstellenFehler").textContent = "";
@@ -1422,14 +1433,12 @@
                             mAktionen.appendChild(btnEinsatzRecht);
                         }
 
-                        if (istBesitzer || istDelegiert) {
-                            var btnEntf = document.createElement("button");
-                            btnEntf.type = "button";
-                            btnEntf.className = "btn-minus";
-                            btnEntf.textContent = "Entfernen";
-                            btnEntf.addEventListener("click", function () { mitgliedAusGruppeEntfernen(g.id, mitglied); });
-                            mAktionen.appendChild(btnEntf);
-                        }
+                        var btnEntf = document.createElement("button");
+                        btnEntf.type = "button";
+                        btnEntf.className = "btn-minus";
+                        btnEntf.textContent = "Entfernen";
+                        btnEntf.addEventListener("click", function () { mitgliedAusGruppeEntfernen(g.id, mitglied); });
+                        mAktionen.appendChild(btnEntf);
 
                         mZeile.appendChild(mAktionen);
                     }
@@ -1442,7 +1451,7 @@
             });
         }
 
-        function toggleGruppenBerechtigung(gruppeId, mitglied) {
+        async function toggleGruppenBerechtigung(gruppeId, mitglied) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
             if (!g || g.besitzer !== aktuellerBenutzer.benutzer) return;
 
@@ -1450,11 +1459,11 @@
             var idx = g.delegierte.indexOf(mitglied);
             if (idx === -1) g.delegierte.push(mitglied);
             else g.delegierte.splice(idx, 1);
-            systemDatenSpeichern();
+            await systemDatenSpeichern();
             renderVerwalteteGruppenListe();
         }
 
-        function toggleEinsatzBerechtigung(gruppeId, mitglied) {
+        async function toggleEinsatzBerechtigung(gruppeId, mitglied) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
             if (!g || g.besitzer !== aktuellerBenutzer.benutzer) return;
 
@@ -1462,43 +1471,44 @@
             var idx = g.einsatzBerechtigte.indexOf(mitglied);
             if (idx === -1) g.einsatzBerechtigte.push(mitglied);
             else g.einsatzBerechtigte.splice(idx, 1);
-            systemDatenSpeichern();
+            await systemDatenSpeichern();
             renderVerwalteteGruppenListe();
         }
 
-        function mitgliedAusGruppeEntfernen(gruppeId, mitglied) {
+        async function mitgliedAusGruppeEntfernen(gruppeId, mitglied) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
             if (!g || mitglied === g.besitzer) return;
             g.mitglieder = (g.mitglieder || []).filter(function (m) { return m !== mitglied; });
             g.delegierte = (g.delegierte || []).filter(function (d) { return d !== mitglied; });
             g.einsatzBerechtigte = (g.einsatzBerechtigte || []).filter(function (e) { return e !== mitglied; });
 
-            var hKey = HELFER_KEY + "_grp_" + g.id;
-            try {
-                var hList = JSON.parse(localStorage.getItem(hKey) || "[]");
+            const hRef = db.collection("helfer").doc("grp_" + g.id);
+            const hSnap = await hRef.get();
+            if (hSnap.exists) {
+                let hList = hSnap.data().liste || [];
                 hList = hList.filter(function (h) { return h.creatorUser !== mitglied; });
-                localStorage.setItem(hKey, JSON.stringify(hList));
-            } catch (e) {}
+                await hRef.set({ liste: hList });
+            }
 
-            systemDatenSpeichern();
+            await systemDatenSpeichern();
             renderVerwalteteGruppenListe();
             meldung(mitglied + " entfernt.");
         }
 
-        function aktualisiereGruppenCodeFallsAbgelaufen(g) {
+        async function aktualisiereGruppenCodeFallsAbgelaufen(g) {
             var jetzt = Date.now();
             if (!g.einladeCode || !g.codeErstelltAm || (jetzt - g.codeErstelltAm >= CODE_TTL_MS)) {
                 g.einladeCode = generiereZufallsCode();
                 g.codeErstelltAm = jetzt;
-                systemDatenSpeichern();
+                await systemDatenSpeichern();
             }
         }
 
-        function oeffneEinladeCodeDialog(gruppeId) {
+        async function oeffneEinladeCodeDialog(gruppeId) {
             var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
             if (!g) return;
             einladeCodeGruppeId = gruppeId;
-            aktualisiereGruppenCodeFallsAbgelaufen(g);
+            await aktualisiereGruppenCodeFallsAbgelaufen(g);
 
             $("einladeCodeTitel").textContent = "Code: " + g.name;
             $("einladeCodeAnzeige").textContent = g.einladeCode;
@@ -1509,13 +1519,13 @@
             $("dlgEinladeCode").showModal();
         }
 
-        $("btnNeuerCodeGenerieren").addEventListener("click", function () {
+        $("btnNeuerCodeGenerieren").addEventListener("click", async function () {
             if (!einladeCodeGruppeId) return;
             var g = gruppenListe.find(function (item) { return item.id === einladeCodeGruppeId; });
             if (!g) return;
             g.einladeCode = generiereZufallsCode();
             g.codeErstelltAm = Date.now();
-            systemDatenSpeichern();
+            await systemDatenSpeichern();
             $("einladeCodeAnzeige").textContent = g.einladeCode;
             $("einladeCodeGueltig").textContent = "Neuer Code erzeugt (24h)";
         });
@@ -1540,7 +1550,7 @@
             if (e.key === "Enter") { e.preventDefault(); $("btnBeitretenBestaetigen").click(); }
         });
 
-        $("btnBeitretenBestaetigen").addEventListener("click", function () {
+        $("btnBeitretenBestaetigen").addEventListener("click", async function () {
             var eingegebenerCode = $("beitrittCodeInput").value.trim().toUpperCase();
             if (!eingegebenerCode) {
                 $("beitrittFehler").textContent = "Bitte Code eingeben.";
@@ -1568,8 +1578,8 @@
                 treffer.mitglieder.push(u);
             }
 
-            systemDatenSpeichern();
-            synchronisiereSystemHelfer(u);
+            await systemDatenSpeichern();
+            await synchronisiereSystemHelfer(u);
 
             aktiveGruppeId = treffer.id;
             try { localStorage.setItem(AKTIVE_GRUPPE_KEY + "_" + u, aktiveGruppeId); } catch (e) {}
@@ -1577,8 +1587,7 @@
             $("dlgGruppeBeitreten").close();
             aktualisiereGruppenLeiste();
             aktualisiereKopfButtons();
-            datenLaden();
-            anzeigen();
+            await datenLaden();
             meldung("Gruppe beigetreten.");
         });
 
@@ -1843,7 +1852,7 @@
             if (e.key === "Enter") { e.preventDefault(); $("hSpeichern").click(); }
         });
 
-        $("hSpeichern").addEventListener("click", function () {
+        $("hSpeichern").addEventListener("click", async function () {
             if (!kannInAktiverGruppeSchreiben()) return;
             var nachname = $("hNachname").value.trim();
             var vorname = $("hVorname").value.trim();
@@ -1862,14 +1871,14 @@
 
             helferListe.push(neuerHelfer);
             helferListe.sort(function (a, b) { return a.nachname.localeCompare(b.nachname, "de"); });
-            helferSpeichern();
+            await helferSpeichern();
 
             if (helferModalKontext === "detail" && aktiverDetailEinsatzId && !istEinsatzBeendet(aktiverDetailEinsatzId)) {
                 var e = findeEinsatz(aktiverDetailEinsatzId);
                 if (e) {
                     if (!e.helferIds) e.helferIds = [];
                     e.helferIds.push(neuerHelfer.id);
-                    datenSpeichern();
+                    await datenSpeichern();
                 }
             }
 
@@ -1881,7 +1890,7 @@
             meldung("Helfer erstellt.");
         });
 
-        function helferLoeschen(helferId) {
+        async function helferLoeschen(helferId) {
             if (!kannInAktiverGruppeSchreiben()) return;
             var hObj = helferListe.find(function (h) { return h.id === helferId; });
             if (hObj && hObj.istSystemHelfer) {
@@ -1890,35 +1899,35 @@
             }
 
             helferListe = helferListe.filter(function (h) { return h.id !== helferId; });
-            helferSpeichern();
+            await helferSpeichern();
 
             daten.laufend.forEach(function (e) {
                 if (e.helferIds) e.helferIds = e.helferIds.filter(function (id) { return id !== helferId; });
             });
-            datenSpeichern();
+            await datenSpeichern();
             anzeigen();
             meldung("Helfer gelöscht.");
         }
 
-        function helferDemEinsatzZuweisen(einsatzId, helferId) {
+        async function helferDemEinsatzZuweisen(einsatzId, helferId) {
             if (istEinsatzBeendet(einsatzId) || !kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(einsatzId);
             if (!e) return;
             if (!e.helferIds) e.helferIds = [];
             if (e.helferIds.indexOf(helferId) === -1) {
                 e.helferIds.push(helferId);
-                datenSpeichern();
+                await datenSpeichern();
                 anzeigen();
                 renderDetailHelfer(e);
             }
         }
 
-        function helferAusEinsatzEntfernen(einsatzId, helferId) {
+        async function helferAusEinsatzEntfernen(einsatzId, helferId) {
             if (istEinsatzBeendet(einsatzId) || !kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(einsatzId);
             if (!e || !e.helferIds) return;
             e.helferIds = e.helferIds.filter(function (id) { return id !== helferId; });
-            datenSpeichern();
+            await datenSpeichern();
             anzeigen();
             renderDetailHelfer(e);
         }
@@ -2006,6 +2015,15 @@
             }
         }
 
+        function findeEinsatz(id) {
+            return daten.laufend.find(function (e) { return e.id === id; }) ||
+                   daten.archiv.find(function (e) { return e.id === id; }) || null;
+        }
+
+        function istEinsatzBeendet(id) {
+            return daten.archiv.some(function (e) { return e.id === id; });
+        }
+
         function oeffneEinsatzDetail(id) {
             abgelaufeneFormulareBereinigen();
             var e = findeEinsatz(id);
@@ -2075,7 +2093,7 @@
             aktiverDetailEinsatzId = null;
         });
 
-        function erstelleFormularKopie(e) {
+        async function erstelleFormularKopie(e) {
             if (istEinsatzBeendet(e.id) || !kannInAktiverGruppeSchreiben()) {
                 return e.formular || null;
             }
@@ -2092,7 +2110,7 @@
                     verbleib: "Zurück in den Unterricht",
                     entlasszeit: ""
                 };
-                datenSpeichern();
+                await datenSpeichern();
                 anzeigen();
             }
             return e.formular;
@@ -2100,9 +2118,9 @@
 
         var FORMULAR_FELD_IDS = ["fRaum", "fAlarmzeit", "fPatientName", "fPatientKlasse", "fHelfer", "fMeldebild", "fMassnahmen", "fVerbleib", "fEntlasszeit"];
 
-        function oeffneFormularDialog(e) {
+        async function oeffneFormularDialog(e) {
             var schreibgeschuetzt = istEinsatzBeendet(e.id) || !kannInAktiverGruppeSchreiben();
-            var f = schreibgeschuetzt ? e.formular : erstelleFormularKopie(e);
+            var f = schreibgeschuetzt ? e.formular : await erstelleFormularKopie(e);
             if (!f) return;
 
             aktiverFormularEinsatzId = e.id;
@@ -2149,12 +2167,12 @@
             datenSpeichern();
         }
 
-        function formularManuellLoeschen(einsatzId) {
+        async function formularManuellLoeschen(einsatzId) {
             if (!kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(einsatzId);
             if (!e || !e.formular) return;
             delete e.formular;
-            datenSpeichern();
+            await datenSpeichern();
             anzeigen();
 
             if ($("dlgFormular").open && aktiverFormularEinsatzId === einsatzId) {
@@ -2202,14 +2220,14 @@
             $(id).addEventListener("change", speichereFormularEingaben);
         });
 
-        function einsatzBeenden(id) {
+        async function einsatzBeenden(id) {
             if (!darfEinsätzeHinzufuegenInAktiverGruppe()) return;
             var i = daten.laufend.findIndex(function (e) { return e.id === id; });
             if (i < 0) return;
             var e = daten.laufend.splice(i, 1)[0];
             e.ende = Date.now();
             daten.archiv.unshift(e);
-            datenSpeichern();
+            await datenSpeichern();
             anzeigen();
             meldung("Einsatz beendet.");
         }
@@ -2224,13 +2242,13 @@
                 "Einsatz \"" + ort + "\" wirklich reaktivieren?",
                 "Aktivieren",
                 "btn-gruen",
-                function () {
+                async function () {
                     var idx = daten.archiv.findIndex(function (item) { return item.id === id; });
                     if (idx < 0) return;
                     var wiederAktiv = daten.archiv.splice(idx, 1)[0];
                     delete wiederAktiv.ende;
                     daten.laufend.unshift(wiederAktiv);
-                    datenSpeichern();
+                    await datenSpeichern();
                     anzeigen();
                     meldung("Einsatz reaktiviert.");
                 }
@@ -2247,11 +2265,11 @@
                 "Einsatz \"" + ort + "\" endgültig löschen?",
                 "Löschen",
                 "btn-rot",
-                function () {
+                async function () {
                     var idx = daten.archiv.findIndex(function (item) { return item.id === id; });
                     if (idx < 0) return;
                     daten.archiv.splice(idx, 1);
-                    datenSpeichern();
+                    await datenSpeichern();
                     anzeigen();
                     meldung("Einsatz gelöscht.");
                 }
@@ -2273,7 +2291,7 @@
 
         $("eAbbrechen").addEventListener("click", function () { $("dlgEinsatz").close(); });
 
-        $("eAnlegen").addEventListener("click", function () {
+        $("eAnlegen").addEventListener("click", async function () {
             if (!darfEinsätzeHinzufuegenInAktiverGruppe()) return;
             var raum = $("eRaum").value.trim();
             var info = $("eInfo").value.trim();
@@ -2289,7 +2307,7 @@
                 beginn: Date.now(),
                 helferIds: []
             });
-            datenSpeichern();
+            await datenSpeichern();
             anzeigen();
             $("dlgEinsatz").close();
             meldung("Einsatz angelegt.");
@@ -2323,17 +2341,17 @@
             if (!box.hidden) box.scrollIntoView({ behavior: "smooth", block: "start" });
         });
 
-        function zeigeMenue(konto) {
+        async function zeigeMenue(konto) {
             aktuellerBenutzer = konto;
             $("name").textContent = konto.benutzer;
             $("loginSeite").hidden = true;
             $("hauptmenue").hidden = false;
             document.body.classList.add("dunkel");
 
+            await systemDatenLaden();
             aktualisiereGruppenLeiste();
             aktualisiereKopfButtons();
-            datenLaden();
-            anzeigen();
+            await datenLaden();
             starteTimerUeberwachung();
             meldung("");
         }
@@ -2348,8 +2366,8 @@
             $("benutzername").focus();
         }
 
-        function anmelden() {
-            systemDatenLaden();
+        async function anmelden() {
+            await systemDatenLaden();
             var benutzer = $("benutzername").value.trim();
             var passwort = $("passwort").value;
             var treffer = kontenListe.find(function (k) { return k.benutzer === benutzer && k.passwort === passwort; });
@@ -2360,7 +2378,7 @@
                 return;
             }
             loginSetzen(benutzer, $("angemeldetBleiben").checked);
-            zeigeMenue(treffer);
+            await zeigeMenue(treffer);
         }
 
         $("loginKnopf").addEventListener("click", anmelden);
@@ -2381,12 +2399,21 @@
             zeigeLogin();
         });
 
-        systemDatenLaden();
-        var gespeichert = loginLesen();
-        if (gespeichert) {
-            var gefundenesKonto = kontenListe.find(function (k) { return k.benutzer === gespeichert; });
-            if (gefundenesKonto) zeigeMenue(gefundenesKonto);
-        }
+        // App beim Start initialisieren
+        (async function () {
+            await systemDatenLaden();
+            var gespeichert = loginLesen();
+            if (gespeichert) {
+                var gefundenesKonto = kontenListe.find(function (k) { return k.benutzer === gespeichert; });
+                if (gefundenesKonto) {
+                    await zeigeMenue(gefundenesKonto);
+                } else {
+                    zeigeLogin();
+                }
+            } else {
+                zeigeLogin();
+            }
+        })();
     </script>
 </body>
 </html>
