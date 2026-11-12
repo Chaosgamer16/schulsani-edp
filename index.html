@@ -128,17 +128,18 @@
         .haupt h2.ueber { font-size: 1.1rem; margin: 1.5rem 0 .7rem; color: #d0d0d0; }
         .kacheln { display: flex; flex-wrap: wrap; gap: .6rem; }
         .kachel {
-            position: relative; width: 100px; height: 90px; display: flex; flex-direction: column;
+            position: relative; width: 105px; height: 90px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: .4rem; padding: .4rem;
             background: var(--d-kachel); color: var(--d-text); border: 1px solid var(--d-linie);
-            border-radius: 6px; font: inherit; font-size: .75rem; cursor: pointer; text-decoration: none;
+            border-radius: 6px; font: inherit; font-size: .74rem; cursor: pointer; text-decoration: none;
+            text-align: center; line-height: 1.15;
         }
         .kachel:hover { background: #474747; }
         .kachel.aktiv { background: var(--rot-dunkel); border-color: #d33; }
         .kachel.aktiv:hover { background: #c42222; }
         .kachel.hlw-ton { background: var(--helles-rot); color: #111111; border-color: #ff9999; font-weight: 700; }
         .kachel.hlw-ton:hover { background: var(--helles-rot-hover); }
-        .kachel svg { width: 22px; height: 22px; fill: currentColor; }
+        .kachel svg { width: 22px; height: 22px; fill: currentColor; flex: none; }
         .zaehler { position: absolute; top: 5px; right: 8px; font-size: .7rem; font-weight: 700; }
 
         .einsatz-kopf { display: flex; justify-content: space-between; align-items: center; margin: 2rem 0 .75rem; gap: .75rem; flex-wrap: wrap; }
@@ -404,6 +405,11 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a4 4 0 110 8 4 4 0 010-8zM4 20c0-4 3.6-6 8-6s8 2 8 6z"/></svg>
                 Helfererfassung
             </button>
+            <!-- Direkt-Button für das Ausfülldokument auf der Startseite -->
+            <button type="button" class="kachel" id="kachelDirektFormular">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Ausfülldokument
+            </button>
         </div>
 
         <h2 class="ueber">Informationen</h2>
@@ -463,7 +469,7 @@
             <p style="margin:0 0 .75rem; font-size:.88rem; color:var(--d-grau);">
                 Dein Anzeigename wird automatisch als Helfer in dieser Gruppe geführt. Du kannst ihn einmal alle <strong>10 Tage</strong> ändern.
             </p>
-            <label for="inputAnzeigename">Anzeigename (Nachname, Vorname)</label>
+            <label for="inputAnzeigename">Anzeigename</label>
             <input type="text" id="inputAnzeigename" placeholder="Nachname, Vorname" autocomplete="off">
             <p id="anzeigenameSperrHinweis" style="font-size:.82rem; color:#ffd28a; margin-top:-.4rem; margin-bottom:.8rem;" hidden></p>
             <p class="dlg-fehler" id="anzeigenameFehler" role="alert"></p>
@@ -713,14 +719,9 @@
                 </div>
             </div>
 
-            <div class="kein-druck" style="margin-top:.6rem; font-size:.8rem; color:#ff9b9b;">
-                ⚠️ Hinweis: Bitte wähle im Druckfenster einen physischen Drucker aus.
-            </div>
-
             <div class="dialog-knoepfe kein-druck" style="margin-top:.85rem;">
-                <button type="button" class="btn-klein" id="btnFormularLoeschen" style="margin-right:auto; border-color:#8a2c2c; color:#ff9b9b;">Formular löschen</button>
                 <button type="button" class="btn-klein" id="btnFormularSchliessen">Schließen</button>
-                <button type="button" class="btn-rot" id="btnDruckenUndLoeschen">Drucken &amp; Daten löschen</button>
+                <button type="button" class="btn-rot" id="btnNurDrucken">Drucken</button>
             </div>
         </div>
     </dialog>
@@ -760,6 +761,7 @@
         var aktiverDetailEinsatzId = null;
         var aktiverFormularEinsatzId = null;
         var aktiverFormularId = null;
+        var direktFormularObj = null;
 
         var timerInterval = null;
         var helferModalKontext = "global";
@@ -1725,7 +1727,7 @@
             if (typeof cb === "function") cb();
         });
 
-        // --- MEHRFACH-FORMULARE LOGIK ---
+        // --- MEHRFACH-FORMULARE & DIREKT-FORMULAR LOGIK ---
 
         function abgelaufeneFormulareBereinigen() {
             var jetzt = Date.now();
@@ -1755,6 +1757,16 @@
                 });
             });
 
+            if (direktFormularObj && (jetzt - direktFormularObj.erstelltAm >= FORMULAR_TTL_MS)) {
+                direktFormularObj = null;
+                if (aktiverFormularEinsatzId === "direkt" && $("dlgFormular").open) {
+                    $("dlgFormular").close();
+                    aktiverFormularEinsatzId = null;
+                    aktiverFormularId = null;
+                    meldung("Direkt-Formular nach 60 Min. geschlossen.");
+                }
+            }
+
             if (geaendert) {
                 datenSpeichern();
                 anzeigen();
@@ -1780,13 +1792,18 @@
                     renderEinsatzFormulareListe(findeEinsatz(aktiverDetailEinsatzId));
                 }
                 if (aktiverFormularEinsatzId && $("dlgFormular").open) {
-                    var e = findeEinsatz(aktiverFormularEinsatzId);
-                    if (e && e.formulare) {
-                        var f = e.formulare.find(function (item) { return item.id === aktiverFormularId; });
-                        if (f) {
-                            var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
-                            $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
+                    var f = null;
+                    if (aktiverFormularEinsatzId === "direkt") {
+                        f = direktFormularObj;
+                    } else {
+                        var e = findeEinsatz(aktiverFormularEinsatzId);
+                        if (e && e.formulare) {
+                            f = e.formulare.find(function (item) { return item.id === aktiverFormularId; });
                         }
+                    }
+                    if (f) {
+                        var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
+                        $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
                     }
                 }
             }, 1000);
@@ -2221,7 +2238,7 @@
                 var btnOpen = document.createElement("button");
                 btnOpen.type = "button";
                 btnOpen.className = "btn-klein";
-                btnOpen.textContent = (beendet || !darfSchreiben) ? "Ansehen / Drucken" : "Öffnen";
+                btnOpen.textContent = "Öffnen";
                 btnOpen.addEventListener("click", function () {
                     oeffneFormularDialog(e, f.id);
                 });
@@ -2282,7 +2299,53 @@
             return neuesForm;
         }
 
+        // Direktes Ausfülldokument über die Startseite öffnen
+        $("kachelDirektFormular").addEventListener("click", function () {
+            direktFormularObj = {
+                id: "direkt_" + Date.now(),
+                erstelltAm: Date.now(),
+                raum: "",
+                alarmzeit: uhrzeit(Date.now()),
+                patientName: "",
+                patientKlasse: "",
+                helfer: getAktuellerAnzeigename(),
+                meldebild: "",
+                massnahmen: "",
+                verbleib: "Zurück in den Unterricht",
+                entlasszeit: ""
+            };
+            oeffneDirektFormularDialog();
+        });
+
         var FORMULAR_FELD_IDS = ["fRaum", "fAlarmzeit", "fPatientName", "fPatientKlasse", "fHelfer", "fMeldebild", "fMassnahmen", "fVerbleib", "fEntlasszeit"];
+
+        function oeffneDirektFormularDialog() {
+            if (!direktFormularObj) return;
+            aktiverFormularEinsatzId = "direkt";
+            aktiverFormularId = direktFormularObj.id;
+
+            $("druckEinsatzId").textContent = "Direkt-Protokoll";
+            $("druckDatum").textContent = new Date().toLocaleDateString("de-DE");
+
+            $("fRaum").value = direktFormularObj.raum;
+            $("fAlarmzeit").value = direktFormularObj.alarmzeit;
+            $("fPatientName").value = direktFormularObj.patientName;
+            $("fPatientKlasse").value = direktFormularObj.patientKlasse;
+            $("fHelfer").value = direktFormularObj.helfer;
+            $("fMeldebild").value = direktFormularObj.meldebild;
+            $("fMassnahmen").value = direktFormularObj.massnahmen;
+            $("fVerbleib").value = direktFormularObj.verbleib;
+            $("fEntlasszeit").value = direktFormularObj.entlasszeit;
+
+            FORMULAR_FELD_IDS.forEach(function (id) { $(id).disabled = false; });
+
+            $("formularDialogTitel").textContent = "Ausfülldokument (Direkt)";
+            $("formularSchreibschutzHinweis").hidden = true;
+            $("btnFormularSchliessen").textContent = "Schließen";
+            var rest = FORMULAR_TTL_MS - (Date.now() - direktFormularObj.erstelltAm);
+            $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
+            $("dlgFormular").showModal();
+        }
 
         function oeffneFormularDialog(e, formId) {
             migriereEinsatzFormulare(e);
@@ -2312,8 +2375,6 @@
             $("formularDialogTitel").textContent = schreibgeschuetzt ? "Protokoll #" + nummer + " (Schreibgeschützt)" : "Protokoll #" + nummer;
             $("formularSchreibschutzHinweis").hidden = !schreibgeschuetzt;
             $("btnFormularSchliessen").textContent = schreibgeschuetzt ? "Schließen" : "Speichern & Schließen";
-            $("btnFormularLoeschen").hidden = !kannInAktiverGruppeSchreiben();
-            $("btnDruckenUndLoeschen").hidden = !kannInAktiverGruppeSchreiben() || schreibgeschuetzt;
 
             var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
             $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
@@ -2322,6 +2383,21 @@
 
         function speichereFormularEingaben() {
             if (!aktiverFormularEinsatzId || !aktiverFormularId) return;
+
+            if (aktiverFormularEinsatzId === "direkt") {
+                if (!direktFormularObj) return;
+                direktFormularObj.raum = $("fRaum").value;
+                direktFormularObj.alarmzeit = $("fAlarmzeit").value;
+                direktFormularObj.patientName = $("fPatientName").value;
+                direktFormularObj.patientKlasse = $("fPatientKlasse").value;
+                direktFormularObj.helfer = $("fHelfer").value;
+                direktFormularObj.meldebild = $("fMeldebild").value;
+                direktFormularObj.massnahmen = $("fMassnahmen").value;
+                direktFormularObj.verbleib = $("fVerbleib").value;
+                direktFormularObj.entlasszeit = $("fEntlasszeit").value;
+                return;
+            }
+
             if (istEinsatzBeendet(aktiverFormularEinsatzId) || !kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(aktiverFormularEinsatzId);
             if (!e || !e.formulare) return;
@@ -2341,6 +2417,15 @@
         }
 
         async function formularManuellLoeschen(einsatzId, formId) {
+            if (einsatzId === "direkt") {
+                direktFormularObj = null;
+                $("dlgFormular").close();
+                aktiverFormularEinsatzId = null;
+                aktiverFormularId = null;
+                meldung("Formular gelöscht.");
+                return;
+            }
+
             if (!kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(einsatzId);
             if (!e || !e.formulare) return;
@@ -2359,43 +2444,22 @@
             meldung("Protokoll gelöscht.");
         }
 
-        $("btnFormularLoeschen").addEventListener("click", function () {
-            if (aktiverFormularEinsatzId && aktiverFormularId) {
-                formularManuellLoeschen(aktiverFormularEinsatzId, aktiverFormularId);
-            }
-        });
-
-        // Drucken & automatische datenschutzkonforme Löschung nach Schließen des Druckfensters
-        $("btnDruckenUndLoeschen").addEventListener("click", function () {
-            if (aktiverFormularEinsatzId && !istEinsatzBeendet(aktiverFormularEinsatzId) && kannInAktiverGruppeSchreiben()) {
+        // Nur Drucken (ohne automatisches Löschen)
+        $("btnNurDrucken").addEventListener("click", function () {
+            if (aktiverFormularEinsatzId && aktiverFormularEinsatzId !== "direkt" && !istEinsatzBeendet(aktiverFormularEinsatzId) && kannInAktiverGruppeSchreiben()) {
                 speichereFormularEingaben();
             }
-
             window.print();
-
-            window.onafterprint = async function () {
-                window.onafterprint = null;
-                if (aktiverFormularEinsatzId) {
-                    var e = findeEinsatz(aktiverFormularEinsatzId);
-                    if (e && e.formulare) {
-                        e.formulare = e.formulare.filter(function (item) { return item.id !== aktiverFormularId; });
-                        await datenSpeichern();
-                        anzeigen();
-                    }
-                }
-                if ($("dlgFormular").open) {
-                    $("dlgFormular").close();
-                }
-                if ($("dlgEinsatzDetail").open && aktiverDetailEinsatzId) {
-                    renderEinsatzFormulareListe(findeEinsatz(aktiverDetailEinsatzId));
-                }
-                aktiverFormularEinsatzId = null;
-                aktiverFormularId = null;
-                meldung("Dokument gedruckt und datenschutzkonform gelöscht.");
-            };
         });
 
         $("btnFormularSchliessen").addEventListener("click", function () {
+            if (aktiverFormularEinsatzId === "direkt") {
+                $("dlgFormular").close();
+                aktiverFormularEinsatzId = null;
+                aktiverFormularId = null;
+                return;
+            }
+
             var schreibgeschuetzt = aktiverFormularEinsatzId ? (istEinsatzBeendet(aktiverFormularEinsatzId) || !kannInAktiverGruppeSchreiben()) : false;
             if (!schreibgeschuetzt) speichereFormularEingaben();
             $("dlgFormular").close();
