@@ -24,6 +24,8 @@
             --weiss: #ffffff;
             --rot: #d62828;
             --rot-dunkel: #b21c1c;
+            --helles-rot: #ff6b6b; /* Sehr helles Rot für den HLW-Ton Button */
+            --helles-rot-hover: #ff5252;
             --orange: #f57c00;
             --blau: #1976d2;
             --d-grund: #1b1b1b;
@@ -130,6 +132,18 @@
         .kachel:hover { background: #474747; }
         .kachel.aktiv { background: var(--rot-dunkel); border-color: #d33; }
         .kachel.aktiv:hover { background: #c42222; }
+        
+        /* Spezieller Stil für die HLW-Ton Kachel mit sehr hellem Rot */
+        .kachel.hlw-ton {
+            background: var(--helles-rot);
+            color: #111111;
+            border-color: #ff9999;
+            font-weight: 700;
+        }
+        .kachel.hlw-ton:hover {
+            background: var(--helles-rot-hover);
+        }
+
         .kachel svg { width: 22px; height: 22px; fill: currentColor; }
         .zaehler { position: absolute; top: 5px; right: 8px; font-size: .7rem; font-weight: 700; }
 
@@ -388,6 +402,11 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h7l2 2h9v12H3zm2 4v8h14V9z"/></svg>
                 Archiv
             </button>
+            <!-- Neuer HLW-Ton Button mit sehr hellem Rot und externem Link -->
+            <a href="https://theonlinemetronome.com/metronome/120-bpm" target="_blank" rel="noopener noreferrer" class="kachel hlw-ton">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                HLW-Ton
+            </a>
         </div>
 
         <!-- Ansicht: Einsätze & Archiv -->
@@ -1025,7 +1044,6 @@
                     if (g.delegierte) g.delegierte = g.delegierte.filter(function (d) { return d !== u; });
                     if (g.einsatzBerechtigte) g.einsatzBerechtigte = g.einsatzBerechtigte.filter(function (e) { return e !== u; });
 
-                    // Helfer aus der Gruppe für diesen User löschen
                     const hRef = db.collection("helfer").doc("grp_" + g.id);
                     const hSnap = await hRef.get();
                     if (hSnap.exists) {
@@ -1495,20 +1513,17 @@
             meldung(mitglied + " entfernt.");
         }
 
-        async function aktualisiereGruppenCodeFallsAbgelaufen(g) {
+        async function oeffneEinladeCodeDialog(gruppeId) {
+            var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
+            if (!g) return;
+            einladeCodeGruppeId = gruppeId;
+            
             var jetzt = Date.now();
             if (!g.einladeCode || !g.codeErstelltAm || (jetzt - g.codeErstelltAm >= CODE_TTL_MS)) {
                 g.einladeCode = generiereZufallsCode();
                 g.codeErstelltAm = jetzt;
                 await systemDatenSpeichern();
             }
-        }
-
-        async function oeffneEinladeCodeDialog(gruppeId) {
-            var g = gruppenListe.find(function (item) { return item.id === gruppeId; });
-            if (!g) return;
-            einladeCodeGruppeId = gruppeId;
-            await aktualisiereGruppenCodeFallsAbgelaufen(g);
 
             $("einladeCodeTitel").textContent = "Code: " + g.name;
             $("einladeCodeAnzeige").textContent = g.einladeCode;
@@ -1528,6 +1543,7 @@
             await systemDatenSpeichern();
             $("einladeCodeAnzeige").textContent = g.einladeCode;
             $("einladeCodeGueltig").textContent = "Neuer Code erzeugt (24h)";
+            meldung("Neuer Einlade-Code in Cloud gespeichert.");
         });
 
         $("btnEinladeCodeSchliessen").addEventListener("click", function () {
