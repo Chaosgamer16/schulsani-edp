@@ -206,10 +206,10 @@
 
         dialog {
             background: var(--d-flaeche); color: var(--d-text); border: 1px solid var(--d-linie);
-            border-radius: 8px; padding: 1.25rem; width: 95vw; max-width: 520px; max-height: 90vh; overflow-y: auto;
+            border-radius: 8px; padding: 1.25rem; width: 95vw; max-width: 850px; max-height: 95vh; overflow-y: auto;
         }
         dialog.mittel { max-width: 580px; }
-        dialog.breit { max-width: 760px; }
+        dialog.breit { max-width: 850px; }
         dialog::backdrop { background: rgba(0,0,0,0.75); }
         dialog h3 { margin: 0 0 .85rem; font-size: 1.1rem; }
         dialog h3.orange-titel {
@@ -217,9 +217,9 @@
         }
         dialog label { display: block; font-size: .88rem; margin-bottom: .25rem; font-weight: 700; }
         dialog input, dialog textarea, dialog select {
-            width: 100%; font: inherit; padding: .6rem .7rem; margin-bottom: .75rem;
-            background: #1b1b1b; color: var(--d-text); border: 1px solid var(--d-linie); border-radius: 6px;
-            font-size: 16px;
+            width: 100%; font: inherit; padding: .5rem .6rem; margin-bottom: .5rem;
+            background: #1b1b1b; color: var(--d-text); border: 1px solid var(--d-linie); border-radius: 4px;
+            font-size: 15px;
         }
         dialog input:disabled, dialog textarea:disabled, dialog select:disabled {
             opacity: 0.72; cursor: not-allowed; background: #161616;
@@ -284,14 +284,49 @@
             padding: .6rem .75rem; margin-bottom: .45rem;
         }
 
-        .formular-blatt {
-            background: #1e1e1e; border: 1px solid var(--d-linie); border-radius: 6px;
-            padding: .85rem; margin-top: .4rem;
+        /* Styling des exakten PDF-Protokolls */
+        .protokoll-form {
+            background: #222222; border: 1.5px solid var(--d-linie); border-radius: 6px;
+            padding: 1rem; color: var(--d-text); font-size: 0.88rem;
         }
-        .form-grid-2 { display: grid; grid-template-columns: 1fr; gap: .5rem; }
-        @media (min-width: 640px) {
-            .form-grid-2 { grid-template-columns: 1fr 1fr; gap: .75rem; }
+        .protokoll-kopf-tabelle {
+            display: grid; grid-template-columns: 2fr 2fr; gap: 8px; margin-bottom: 8px;
+            border: 1px solid var(--d-linie); padding: 8px; border-radius: 4px; background: #1c1c1c;
         }
+        .protokoll-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .protokoll-sektion {
+            border: 1px solid var(--d-linie); border-radius: 4px; padding: 8px; margin-bottom: 8px; background: #1c1c1c;
+        }
+        .protokoll-sektion-titel {
+            font-weight: 700; background: #2f2f2f; padding: 4px 8px; margin: -8px -8px 8px -8px; border-bottom: 1px solid var(--d-linie);
+            font-size: 0.9rem; color: #ffd28a;
+        }
+
+        /* Klickbare Checkboxen */
+        .form-checkbox {
+            display: inline-flex; align-items: center; gap: 4px; cursor: pointer; user-select: none; margin-right: 8px; font-weight: normal;
+        }
+        .form-checkbox .box-box {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border: 1.5px solid var(--d-text); background: #1b1b1b; border-radius: 3px;
+            font-size: 13px; font-weight: bold; color: var(--orange);
+        }
+        .form-checkbox.checked .box-box::after { content: "☒"; }
+        .form-checkbox:not(.checked) .box-box::after { content: "☐"; opacity: 0.4; }
+
+        /* Interaktive Körperteile */
+        .koerper-container {
+            display: flex; justify-content: center; gap: 1rem; align-items: center; margin: 0.5rem 0;
+        }
+        .koerper-figur {
+            width: 90px; height: 160px; position: relative; border: 1px dashed var(--d-linie); background: #141414; border-radius: 4px; padding: 4px; display: flex; flex-direction: column; align-items: center;
+        }
+        .koerper-teil {
+            cursor: pointer; fill: #333333; stroke: #666; stroke-width: 1; transition: fill 0.15s;
+        }
+        .koerper-teil:hover { fill: #555555; }
+        .koerper-teil.rot { fill: var(--rot) !important; stroke: #ff9999 !important; }
+
         .formular-kopf-druck { display: none; }
         .druck-sperrvermerk { display: none; }
 
@@ -304,7 +339,7 @@
         }
 
         @media print {
-            @page { margin: 12mm; }
+            @page { margin: 8mm; size: A4 portrait; }
             body * { visibility: hidden; }
             #dlgFormular, #dlgFormular * { visibility: visible; }
             #dlgFormular {
@@ -313,27 +348,35 @@
                 color: #000000 !important; box-shadow: none; max-height: none;
                 overflow: visible !important;
             }
-            .formular-blatt {
-                background: #ffffff !important; border: 1.5px solid #000000 !important;
-                color: #000000 !important; padding: 7mm;
+            .protokoll-form {
+                background: #ffffff !important; border: 1px solid #000000 !important;
+                color: #000000 !important; padding: 4mm; font-size: 8pt;
+            }
+            .protokoll-kopf-tabelle, .protokoll-sektion {
+                background: #ffffff !important; border: 1px solid #000000 !important;
+            }
+            .protokoll-sektion-titel {
+                background: #e0e0e0 !important; color: #000000 !important; border-bottom: 1px solid #000000 !important;
             }
             .formular-kopf-druck {
                 display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 2px solid #000000; padding-bottom: 4mm; margin-bottom: 5mm;
+                border-bottom: 2px solid #000000; padding-bottom: 2mm; margin-bottom: 3mm;
             }
             .druck-sperrvermerk {
                 display: block !important;
-                margin-top: 6mm; padding: 3mm;
+                margin-top: 4mm; padding: 2mm;
                 border: 1px solid #000000;
-                font-size: 8.5pt; font-weight: bold; text-align: center;
+                font-size: 7.5pt; font-weight: bold; text-align: center;
                 text-transform: uppercase;
             }
             #dlgFormular input, #dlgFormular textarea, #dlgFormular select {
                 background: #ffffff !important; color: #000000 !important;
                 border: 1px solid #444444 !important; opacity: 1 !important;
-                -webkit-appearance: none; appearance: none;
             }
-            #dlgFormular label { color: #000000 !important; }
+            #dlgFormular label, .form-checkbox { color: #000000 !important; }
+            .koerper-figur { background: #fff !important; border: 1px solid #000 !important; }
+            .koerper-teil { stroke: #000 !important; }
+            .koerper-teil.rot { fill: #d62828 !important; }
             .kein-druck { display: none !important; }
         }
     </style>
@@ -407,6 +450,7 @@
             </button>
             <!-- Direkt-Button für das Ausfülldokument auf der Startseite -->
             <button type="button" class="kachel" id="kachelDirektFormular">
+                <span class="zaehler" id="zaehlerDirektFormulare">0</span>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 Ausfülldokument
             </button>
@@ -459,6 +503,22 @@
             </div>
         </div>
 
+        <!-- Ansicht: Ausfülldokumente (Direkt-Formulare) -->
+        <div id="ansichtDirektFormulare" hidden>
+            <div class="einsatz-kopf">
+                <h2>Ausfülldokumente</h2>
+                <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+                    <button type="button" class="btn-rot" id="neuesDirektFormularBtn">+ Formular erstellen</button>
+                    <button type="button" class="btn-klein" id="zurueckZuEinsaetzenVonFormularen">Zurück zu Einsätzen</button>
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="box-kopf"><span class="zahl" id="zahlDirektFormularListe">0</span> Angelegte Ausfülldokumente</div>
+                <div id="listeDirektFormulareGlobal"></div>
+            </div>
+        </div>
+
         <p class="meldung" id="meldung" role="status"></p>
     </div>
 
@@ -470,7 +530,7 @@
                 Dein Anzeigename wird automatisch als Helfer in dieser Gruppe geführt. Du kannst ihn einmal alle <strong>10 Tage</strong> ändern.
             </p>
             <label for="inputAnzeigename">Anzeigename</label>
-            <input type="text" id="inputAnzeigename" placeholder="Nachname, Vorname" autocomplete="off">
+            <input type="text" id="inputAnzeigename" placeholder="" autocomplete="off">
             <p id="anzeigenameSperrHinweis" style="font-size:.82rem; color:#ffd28a; margin-top:-.4rem; margin-bottom:.8rem;" hidden></p>
             <p class="dlg-fehler" id="anzeigenameFehler" role="alert"></p>
             <div class="dialog-knoepfe">
@@ -483,8 +543,8 @@
     <dialog id="dlgVerwalten" class="mittel">
         <div>
             <h3 class="orange-titel">Benutzer-Accounts verwalten &amp; anlegen</h3>
-            <input type="text" id="neuAccBenutzer" placeholder="Benutzername" autocomplete="off">
-            <input type="password" id="neuAccPasswort" placeholder="Login-Passwort" autocomplete="new-password">
+            <input type="text" id="neuAccBenutzer" placeholder="" autocomplete="off">
+            <input type="password" id="neuAccPasswort" placeholder="" autocomplete="new-password">
             <select id="neuAccSchreibrecht">
                 <option value="true">Schreibrecht: Ja</option>
                 <option value="false">Schreibrecht: Nein</option>
@@ -501,7 +561,7 @@
         <div>
             <h3 class="orange-titel" id="pwResetTitel">Login-PW zurücksetzen</h3>
             <label for="pwResetNeu">Neues Login-Passwort</label>
-            <input type="password" id="pwResetNeu" placeholder="Passwort eingeben">
+            <input type="password" id="pwResetNeu" placeholder="">
             <p class="dlg-fehler" id="pwResetFehler" role="alert"></p>
             <div class="dialog-knoepfe">
                 <button type="button" class="btn-klein" id="pwResetAbbrechen">Abbrechen</button>
@@ -516,7 +576,7 @@
             <div id="bereichGruppeErstellen" class="detail-abschnitt" hidden>
                 <h4>Neue Gruppe erstellen</h4>
                 <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
-                    <input type="text" id="neueGruppeName" placeholder="Gruppenname eingeben" style="margin-bottom:0; flex:1; min-width:180px;">
+                    <input type="text" id="neueGruppeName" placeholder="" style="margin-bottom:0; flex:1; min-width:180px;">
                     <button type="button" class="btn-rot" id="btnGruppeErstellen">Gruppe erstellen</button>
                 </div>
                 <p class="dlg-fehler" id="gruppeErstellenFehler" role="alert" style="margin:.3rem 0 0;"></p>
@@ -548,7 +608,7 @@
         <div>
             <h3 class="orange-titel">Gruppe beitreten</h3>
             <label for="beitrittCodeInput">Einlade-Code eingeben</label>
-            <input type="text" id="beitrittCodeInput" placeholder="Code eingeben" autocomplete="off" style="text-transform:uppercase; font-family:monospace; letter-spacing:.15rem;">
+            <input type="text" id="beitrittCodeInput" placeholder="" autocomplete="off" style="text-transform:uppercase; font-family:monospace; letter-spacing:.15rem;">
             <p class="dlg-fehler" id="beitrittFehler" role="alert"></p>
             <div class="dialog-knoepfe">
                 <button type="button" class="btn-klein" id="btnBeitretenAbbrechen">Abbrechen</button>
@@ -561,9 +621,9 @@
         <div id="formEinsatz">
             <h3>Neuer Einsatz</h3>
             <label for="eRaum">Raum / Ort</label>
-            <input id="eRaum" type="text" placeholder="Ort eingeben" autocomplete="off">
+            <input id="eRaum" type="text" placeholder="" autocomplete="off">
             <label for="eInfo">Kurze Informationen (optional)</label>
-            <textarea id="eInfo" rows="2" placeholder="Informationen eingeben"></textarea>
+            <textarea id="eInfo" rows="2" placeholder=""></textarea>
             <p class="dlg-fehler" id="eFehler" role="alert"></p>
             <div class="dialog-knoepfe">
                 <button type="button" class="btn-klein" id="eAbbrechen">Abbrechen</button>
@@ -576,9 +636,9 @@
         <div>
             <h3>Neuen Helfer erstellen</h3>
             <label for="hNachname">Nachname</label>
-            <input id="hNachname" type="text" placeholder="Nachname" autocomplete="off">
+            <input id="hNachname" type="text" placeholder="" autocomplete="off">
             <label for="hVorname">Vorname</label>
-            <input id="hVorname" type="text" placeholder="Vorname" autocomplete="off">
+            <input id="hVorname" type="text" placeholder="" autocomplete="off">
             <p class="dlg-fehler" id="hFehler" role="alert"></p>
             <div class="dialog-knoepfe">
                 <button type="button" class="btn-klein" id="hAbbrechen">Abbrechen</button>
@@ -638,10 +698,11 @@
         </div>
     </dialog>
 
+    <!-- Exaktes Einsatzprotokoll Formular (Dialog) -->
     <dialog id="dlgFormular" class="breit">
         <div>
             <div class="kein-druck" style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem;">
-                <h3 id="formularDialogTitel" style="margin:0;">Einsatzprotokoll</h3>
+                <h3 id="formularDialogTitel" style="margin:0;">Einsatzprotokoll Schulsanitätsdienst</h3>
                 <span id="formularCountdown" class="timer-badge" style="margin:0;">Löschung in 60:00 Min.</span>
             </div>
 
@@ -649,68 +710,247 @@
                 Dieser Einsatz ist beendet – das Dokument ist schreibgeschützt.
             </p>
 
-            <div class="formular-blatt">
+            <div class="protokoll-form">
                 <div class="formular-kopf-druck">
                     <div>
-                        <strong style="font-size:1.2rem;">Schulsanitätsdienst</strong><br>
+                        <strong style="font-size:1.1rem;">Schulsanitätsdienst</strong><br>
                         <span>Einsatzprotokoll (Vertraulich)</span>
                     </div>
-                    <div style="text-align:right; font-size:.85rem;">
+                    <div style="text-align:right; font-size:.8rem;">
                         <strong>Protokoll-Nr.:</strong> <span id="druckEinsatzId"></span><br>
                         <strong>Datum:</strong> <span id="druckDatum"></span>
                     </div>
                 </div>
 
-                <div class="form-grid-2">
-                    <div>
-                        <label for="fRaum">Raum / Einsatzort</label>
-                        <input id="fRaum" type="text" placeholder="Einsatzort eingeben">
+                <!-- Kopfbereich: Betroffene*r & Einsatz -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Betroffene*r</div>
+                        <label>Vorname / Name:</label>
+                        <input id="fPatientName" type="text" placeholder="Name, Vorname">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+                            <div>
+                                <label>Geburtsdatum:</label>
+                                <input id="fGeburtstag" type="text" placeholder="TT.MM.JJJJ">
+                            </div>
+                            <div>
+                                <label>Klasse / Jahrgang:</label>
+                                <input id="fPatientKlasse" type="text" placeholder="Klasse">
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;">
+                            <label>Geschlecht:</label>
+                            <span class="form-checkbox" data-field="geschlecht" data-val="m"><span class="box-box"></span> m</span>
+                            <span class="form-checkbox" data-field="geschlecht" data-val="w"><span class="box-box"></span> w</span>
+                            <span class="form-checkbox" data-field="geschlecht" data-val="d"><span class="box-box"></span> d</span>
+                        </div>
                     </div>
-                    <div>
-                        <label for="fAlarmzeit">Alarmzeit / Beginn</label>
-                        <input id="fAlarmzeit" type="text" placeholder="Uhrzeit eingeben">
+
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Einsatz</div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+                            <div>
+                                <label>Einsatzart:</label>
+                                <span class="form-checkbox" data-field="einsatzart" data-val="chirurgisch"><span class="box-box"></span> chirurgisch</span><br>
+                                <span class="form-checkbox" data-field="einsatzart" data-val="internistisch"><span class="box-box"></span> internistisch</span>
+                            </div>
+                            <div>
+                                <label>Lfd. Nr. / Schuljahr:</label>
+                                <input id="fLfdSchuljahr" type="text" placeholder="Nr. / Jahr">
+                            </div>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:4px;">
+                            <div>
+                                <label>Datum:</label>
+                                <input id="fDatum" type="text" placeholder="DD.MM.YYYY">
+                            </div>
+                            <div>
+                                <label>Anfangszeit / Endzeit:</label>
+                                <div style="display:flex; gap:4px;">
+                                    <input id="fAlarmzeit" type="text" placeholder="Beginn">
+                                    <input id="fEntlasszeit" type="text" placeholder="Ende">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:4px;">
+                            <label>Einsatzort:</label>
+                            <span class="form-checkbox" data-field="ortTyp" data-val="raum"><span class="box-box"></span> SSD-Raum</span>
+                            <input id="fRaum" type="text" placeholder="Anderer Ort / Raum" style="margin-top:2px;">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-grid-2">
-                    <div>
-                        <label for="fPatientName">Name Patient/in</label>
-                        <input id="fPatientName" type="text" placeholder="Name eingeben">
+                <!-- Mitte: Anamnese & Messwerte -->
+                <div style="display:grid; grid-template-columns: 1.1fr 1.3fr; gap: 8px; margin-bottom: 8px;">
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Anamnese / Unfallhergang</div>
+                        <textarea id="fMeldebild" rows="4" placeholder="Unfallhergang / Krankengeschichte / SAMMELN..."></textarea>
+                        
+                        <div style="font-size:0.8rem; margin-top:4px; font-weight:700; text-align:center;">Körper-Schema (Klick auf betroffenen Bereich):</div>
+                        <div class="koerper-container">
+                            <!-- Figur 1 -->
+                            <div class="koerper-figur">
+                                <svg width="70" height="140" viewBox="0 0 100 200">
+                                    <!-- Kopf -->
+                                    <circle cx="50" cy="20" r="15" class="koerper-teil" data-part="fig1_kopf"/>
+                                    <!-- Rumpf / Brust / Bauch -->
+                                    <path d="M35 40 L65 40 L65 95 L35 95 Z" class="koerper-teil" data-part="fig1_rumpf"/>
+                                    <!-- Linke Hand/Arm -->
+                                    <path d="M20 42 L32 42 L32 90 L20 90 Z" class="koerper-teil" data-part="fig1_l_arm"/>
+                                    <!-- Rechte Hand/Arm -->
+                                    <path d="M68 42 L80 42 L80 90 L68 90 Z" class="koerper-teil" data-part="fig1_r_arm"/>
+                                    <!-- Linkes Bein -->
+                                    <path d="M37 98 L48 98 L48 180 L37 180 Z" class="koerper-teil" data-part="fig1_l_bein"/>
+                                    <!-- Rechtes Bein -->
+                                    <path d="M52 98 L63 98 L63 180 L52 180 Z" class="koerper-teil" data-part="fig1_r_bein"/>
+                                </svg>
+                                <small style="color:var(--d-grau);">Vorderseite</small>
+                            </div>
+                            <!-- Figur 2 -->
+                            <div class="koerper-figur">
+                                <svg width="70" height="140" viewBox="0 0 100 200">
+                                    <!-- Kopf -->
+                                    <circle cx="50" cy="20" r="15" class="koerper-teil" data-part="fig2_kopf"/>
+                                    <!-- Rumpf / Rücken -->
+                                    <path d="M35 40 L65 40 L65 95 L35 95 Z" class="koerper-teil" data-part="fig2_ruecken"/>
+                                    <!-- Linker Arm -->
+                                    <path d="M20 42 L32 42 L32 90 L20 90 Z" class="koerper-teil" data-part="fig2_l_arm"/>
+                                    <!-- Rechter Arm -->
+                                    <path d="M68 42 L80 42 L80 90 L68 90 Z" class="koerper-teil" data-part="fig2_r_arm"/>
+                                    <!-- Linkes Bein -->
+                                    <path d="M37 98 L48 98 L48 180 L37 180 Z" class="koerper-teil" data-part="fig2_l_bein"/>
+                                    <!-- Rechtes Bein -->
+                                    <path d="M52 98 L63 98 L63 180 L52 180 Z" class="koerper-teil" data-part="fig2_r_bein"/>
+                                </svg>
+                                <small style="color:var(--d-grau);">Rückseite</small>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="fPatientKlasse">Klasse / Jahrgang</label>
-                        <input id="fPatientKlasse" type="text" placeholder="Klasse eingeben">
+
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Messwerte &amp; Vitalfunktionen</div>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; font-size:0.82rem;">
+                            <div>
+                                <strong>Bewusstsein:</strong><br>
+                                <span class="form-checkbox" data-field="bew_1" data-val="wach"><span class="box-box"></span> wach, orientiert</span><br>
+                                <span class="form-checkbox" data-field="bew_1" data-val="eingetruebt"><span class="box-box"></span> eingetrübt, verwirrt</span><br>
+                                <span class="form-checkbox" data-field="bew_1" data-val="bewusstlos"><span class="box-box"></span> bewusstlos</span>
+                            </div>
+                            <div>
+                                <strong>Atmung:</strong><br>
+                                <span class="form-checkbox" data-field="atm_1" data-val="unauffaellig"><span class="box-box"></span> unauffällig</span><br>
+                                <span class="form-checkbox" data-field="atm_1" data-val="atembeschwerden"><span class="box-box"></span> Atembeschwerden / Not</span><br>
+                                <span class="form-checkbox" data-field="atm_1" data-val="hyperventilation"><span class="box-box"></span> Hyperventilation</span>
+                                <input id="fAtemzuege" type="text" placeholder="Atemzüge/min" style="margin-top:2px; font-size:0.8rem; padding:2px;">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:4px; font-size:0.82rem;">
+                            <div>
+                                <label>Puls / Blutdruck:</label>
+                                <input id="fPuls" type="text" placeholder="Puls /min" style="margin-bottom:2px; padding:2px;">
+                                <span class="form-checkbox" data-field="puls_reg" data-val="ja"><span class="box-box"></span> regelm. ja</span>
+                                <span class="form-checkbox" data-field="puls_reg" data-val="nein"><span class="box-box"></span> nein</span>
+                            </div>
+                            <div>
+                                <label>Blutdruck / Temp:</label>
+                                <input id="fBlutdruck" type="text" placeholder="RR mmHg" style="margin-bottom:2px; padding:2px;">
+                                <input id="fTemperatur" type="text" placeholder="°C Temp" style="padding:2px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top:4px; font-size:0.82rem;">
+                            <strong>Pupillen:</strong>
+                            <span class="form-checkbox" data-field="pupillen" data-val="normal"><span class="box-box"></span> normal</span>
+                            <span class="form-checkbox" data-field="pupillen" data-val="ungleich"><span class="box-box"></span> ungleich</span>
+                            <span class="form-checkbox" data-field="pupillen" data-val="vergroessert"><span class="box-box"></span> vergrößert</span>
+                            <span class="form-checkbox" data-field="pupillen" data-val="verkleinert"><span class="box-box"></span> verkleinert</span>
+                        </div>
+
+                        <div style="margin-top:4px; font-size:0.82rem;">
+                            <strong>Schmerzen (Skala 0-10):</strong>
+                            <div style="display:flex; gap:2px; flex-wrap:wrap; margin-top:2px;">
+                                <span class="form-checkbox" data-field="schmerz" data-val="0"><span class="box-box"></span> 0</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="1"><span class="box-box"></span> 1</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="2"><span class="box-box"></span> 2</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="3"><span class="box-box"></span> 3</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="4"><span class="box-box"></span> 4</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="5"><span class="box-box"></span> 5</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="6"><span class="box-box"></span> 6</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="7"><span class="box-box"></span> 7</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="8"><span class="box-box"></span> 8</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="9"><span class="box-box"></span> 9</span>
+                                <span class="form-checkbox" data-field="schmerz" data-val="10"><span class="box-box"></span> 10</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label for="fHelfer">Eingesetzte Helfer</label>
-                    <input id="fHelfer" type="text" placeholder="Helfer eingeben">
-                </div>
-
-                <div>
-                    <label for="fMeldebild">Meldebild / Verletzung</label>
-                    <textarea id="fMeldebild" rows="2" placeholder="Beschreibung eingeben"></textarea>
-                </div>
-
-                <div>
-                    <label for="fMassnahmen">Durchgeführte Maßnahmen</label>
-                    <textarea id="fMassnahmen" rows="3" placeholder="Maßnahmen eingeben"></textarea>
-                </div>
-
-                <div class="form-grid-2">
-                    <div>
-                        <label for="fVerbleib">Verbleib / Übergabe an</label>
-                        <select id="fVerbleib">
-                            <option value="Zurück in den Unterricht">Zurück in den Unterricht</option>
-                            <option value="Abholung durch Eltern">Abholung durch Eltern</option>
-                            <option value="Übergabe an Rettungsdienst / Notarzt">Übergabe an Rettungsdienst / Notarzt</option>
-                            <option value="Sekretariat / Sanitätsraum">Sekretariat / Sanitätsraum</option>
-                        </select>
+                <!-- Maßnahmen & Lagerung -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Maßnahmen</div>
+                        <span class="form-checkbox" data-field="massn" data-val="wund"><span class="box-box"></span> Wundversorgung</span>
+                        <span class="form-checkbox" data-field="massn" data-val="kuehlung"><span class="box-box"></span> Kühlung</span>
+                        <span class="form-checkbox" data-field="massn" data-val="ruhig"><span class="box-box"></span> Ruhigstellung</span>
+                        <span class="form-checkbox" data-field="massn" data-val="waerme"><span class="box-box"></span> Eigenwärmeerhalt</span>
+                        <span class="form-checkbox" data-field="massn" data-val="beobachtung"><span class="box-box"></span> Ruhe/Beobachtung</span>
+                        <span class="form-checkbox" data-field="massn" data-val="zucker"><span class="box-box"></span> Traubenzucker / Getränke</span>
+                        <textarea id="fMassnahmen" rows="2" placeholder="Weitere Maßnahmen..." style="margin-top:4px;"></textarea>
                     </div>
-                    <div>
-                        <label for="fEntlasszeit">Einsatzende / Uhrzeit</label>
-                        <input id="fEntlasszeit" type="text" placeholder="Uhrzeit eingeben">
+
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Lagerung</div>
+                        <span class="form-checkbox" data-field="lagerung" data-val="sitzend"><span class="box-box"></span> sitzend</span>
+                        <span class="form-checkbox" data-field="lagerung" data-val="schonhaltung"><span class="box-box"></span> Schonhaltung</span>
+                        <span class="form-checkbox" data-field="lagerung" data-val="oberkoerper"><span class="box-box"></span> Oberkörperhochlagerung</span>
+                        <span class="form-checkbox" data-field="lagerung" data-val="flach"><span class="box-box"></span> Flachlagerung</span>
+                        <span class="form-checkbox" data-field="lagerung" data-val="schock"><span class="box-box"></span> Schocklage</span>
+                        <span class="form-checkbox" data-field="lagerung" data-val="seite"><span class="box-box"></span> Stabile Seitenlage</span>
+                    </div>
+                </div>
+
+                <!-- Weiterversorgung & Verbrauchtes Material -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Weiterversorgung &amp; Übergabe</div>
+                        <label>Sorgeberechtigte informiert:</label>
+                        <span class="form-checkbox" data-field="eltern" data-val="ja"><span class="box-box"></span> ja</span>
+                        <span class="form-checkbox" data-field="eltern" data-val="nicht_erreicht"><span class="box-box"></span> nicht erreicht</span>
+                        <input id="fElternUhr" type="text" placeholder="Um Uhrzeit" style="margin-top:2px; font-size:0.8rem; padding:2px;">
+
+                        <label style="margin-top:4px;">Übergabe an:</label>
+                        <span class="form-checkbox" data-field="uebergabe" data-val="unterricht"><span class="box-box"></span> Unterricht</span>
+                        <span class="form-checkbox" data-field="uebergabe" data-val="eltern"><span class="box-box"></span> Sorgeberechtigte</span>
+                        <span class="form-checkbox" data-field="uebergabe" data-val="rettungsdienst"><span class="box-box"></span> Rettungsdienst / Notarzt</span>
+
+                        <label style="margin-top:4px;">Transportziel / Verbleib:</label>
+                        <input id="fVerbleib" type="text" placeholder="Nach Hause / Praxis / Krankenhaus" style="padding:2px;">
+
+                        <label style="margin-top:2px;">Zustandsverlauf:</label>
+                        <span class="form-checkbox" data-field="verlauf" data-val="verbessert"><span class="box-box"></span> verbessert</span>
+                        <span class="form-checkbox" data-field="verlauf" data-val="unveraendert"><span class="box-box"></span> unverändert</span>
+                        <span class="form-checkbox" data-field="verlauf" data-val="verschlechtert"><span class="box-box"></span> verschlechtert</span>
+                    </div>
+
+                    <div class="protokoll-sektion" style="margin-bottom:0;">
+                        <div class="protokoll-sektion-titel">Verbrautes Material &amp; Team</div>
+                        <textarea id="fMaterial" rows="2" placeholder="Verbrauchtes Material (z.B. Pflaster, Kompressen, Verbände)..." style="margin-bottom:6px;"></textarea>
+                        
+                        <label>Schulsanitätsteam / Protokollführer*in:</label>
+                        <input id="fHelfer" type="text" placeholder="Namen der Sanitäter">
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:4px;">
+                            <div>
+                                <label>Unterschrift Sanitäter:</label>
+                                <input type="text" placeholder="Unterschrift" style="padding:2px;">
+                            </div>
+                            <div>
+                                <label>Unterschrift Lehrkraft:</label>
+                                <input type="text" placeholder="Unterschrift" style="padding:2px;">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -757,11 +997,12 @@
 
         var daten = { laufend: [], archiv: [] };
         var helferListe = [];
+        var direktFormulareListe = [];
 
         var aktiverDetailEinsatzId = null;
         var aktiverFormularEinsatzId = null;
         var aktiverFormularId = null;
-        var direktFormularObj = null;
+        var aktivesDirektFormularId = null;
 
         var timerInterval = null;
         var helferModalKontext = "global";
@@ -821,6 +1062,7 @@
         async function datenLaden() {
             daten = { laufend: [], archiv: [] };
             helferListe = [];
+            direktFormulareListe = [];
 
             if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
                 anzeigen();
@@ -834,6 +1076,7 @@
                     var dData = dSnap.data();
                     daten.laufend = dData.laufend || [];
                     daten.archiv = dData.archiv || [];
+                    direktFormulareListe = dData.direktFormulare || [];
                     daten.laufend.forEach(migriereEinsatzFormulare);
                     daten.archiv.forEach(migriereEinsatzFormulare);
                 }
@@ -856,7 +1099,8 @@
                 const docId = aktiveGruppeId === "standard" ? "standard_daten" : "grp_" + aktiveGruppeId;
                 await db.collection("einsaetze").doc(docId).set({
                     laufend: daten.laufend,
-                    archiv: daten.archiv
+                    archiv: daten.archiv,
+                    direktFormulare: direktFormulareListe
                 });
             } catch (e) {
                 console.error("Fehler beim Speichern der Einsätze:", e);
@@ -992,6 +1236,7 @@
             var darfSchreiben = darfEinsätzeHinzufuegenInAktiverGruppe();
             $("neuerEinsatz").hidden = !darfSchreiben;
             $("neuerHelferBtn").hidden = !kannInAktiverGruppeSchreiben();
+            $("neuesDirektFormularBtn").hidden = !kannInAktiverGruppeSchreiben();
         }
 
         function getVerfuegbareGruppenFuerUser() {
@@ -1727,7 +1972,52 @@
             if (typeof cb === "function") cb();
         });
 
-        // --- MEHRFACH-FORMULARE & DIREKT-FORMULAR LOGIK ---
+        // --- INTERAKTIVE CHECKBOXEN & KÖRPERFIGUREN LOGIK ---
+
+        function getAktivesFormularObjekt() {
+            if (!aktiverFormularEinsatzId || !aktiverFormularId) return null;
+            if (aktiverFormularEinsatzId === "direkt") {
+                return direktFormulareListe.find(function (f) { return f.id === aktiverFormularId; });
+            } else {
+                var e = findeEinsatz(aktiverFormularEinsatzId);
+                if (!e || !e.formulare) return null;
+                return e.formulare.find(function (f) { return f.id === aktiverFormularId; });
+            }
+        }
+
+        // Klick-Logik für Checkboxen (Einzel- oder Mehrfachauswahl je nach Feldtyp)
+        document.querySelectorAll(".form-checkbox").forEach(function (cb) {
+            cb.addEventListener("click", function () {
+                var schreibgeschuetzt = aktiverFormularEinsatzId && aktiverFormularEinsatzId !== "direkt" && istEinsatzBeendet(aktiverFormularEinsatzId);
+                if (schreibgeschuetzt || !kannInAktiverGruppeSchreiben()) return;
+
+                var field = cb.getAttribute("data-field");
+                var val = cb.getAttribute("data-val");
+
+                // Bei manchen Feldern (wie geschlecht oder einsatzart) nur eine Option aktiv (Radio-Verhalten)
+                if (field === "geschlecht" || field === "einsatzart" || field === "ortTyp") {
+                    document.querySelectorAll('.form-checkbox[data-field="' + field + '"]').forEach(function (el) {
+                        el.classList.remove("checked");
+                    });
+                    cb.classList.add("checked");
+                } else {
+                    cb.classList.toggle("checked");
+                }
+
+                speichereFormularEingaben();
+            });
+        });
+
+        // Klick-Logik für Körperteile
+        document.querySelectorAll(".koerper-teil").forEach(function (kt) {
+            kt.addEventListener("click", function () {
+                var schreibgeschuetzt = aktiverFormularEinsatzId && aktiverFormularEinsatzId !== "direkt" && istEinsatzBeendet(aktiverFormularEinsatzId);
+                if (schreibgeschuetzt || !kannInAktiverGruppeSchreiben()) return;
+
+                kt.classList.toggle("rot");
+                speichereFormularEingaben();
+            });
+        });
 
         function abgelaufeneFormulareBereinigen() {
             var jetzt = Date.now();
@@ -1741,29 +2031,27 @@
                         e.formulare = e.formulare.filter(function (f) {
                             return f.erstelltAm && (jetzt - f.erstelltAm < FORMULAR_TTL_MS);
                         });
-                        if (e.formulare.length !== vorAnzahl) {
-                            geaendert = true;
-                            if (aktiverFormularEinsatzId === e.id && $("dlgFormular").open) {
-                                var existiertNoch = e.formulare.some(function (f) { return f.id === aktiverFormularId; });
-                                if (!existiertNoch) {
-                                    $("dlgFormular").close();
-                                    aktiverFormularEinsatzId = null;
-                                    aktiverFormularId = null;
-                                    meldung("Formular automatisch gelöscht.");
-                                }
-                            }
-                        }
+                        if (e.formulare.length !== vorAnzahl) geaendert = true;
                     }
                 });
             });
 
-            if (direktFormularObj && (jetzt - direktFormularObj.erstelltAm >= FORMULAR_TTL_MS)) {
-                direktFormularObj = null;
-                if (aktiverFormularEinsatzId === "direkt" && $("dlgFormular").open) {
-                    $("dlgFormular").close();
-                    aktiverFormularEinsatzId = null;
-                    aktiverFormularId = null;
-                    meldung("Direkt-Formular nach 60 Min. geschlossen.");
+            if (direktFormulareListe.length > 0) {
+                var vorDirAnzahl = direktFormulareListe.length;
+                direktFormulareListe = direktFormulareListe.filter(function (f) {
+                    return f.erstelltAm && (jetzt - f.erstelltAm < FORMULAR_TTL_MS);
+                });
+                if (direktFormulareListe.length !== vorDirAnzahl) {
+                    geaendert = true;
+                    if (aktivesDirektFormularId && !direktFormulareListe.some(function (f) { return f.id === aktivesDirektFormularId; })) {
+                        if ($("dlgFormular").open && aktiverFormularEinsatzId === "direkt") {
+                            $("dlgFormular").close();
+                            aktiverFormularEinsatzId = null;
+                            aktiverFormularId = null;
+                            aktivesDirektFormularId = null;
+                            meldung("Formular automatisch gelöscht.");
+                        }
+                    }
                 }
             }
 
@@ -1792,15 +2080,7 @@
                     renderEinsatzFormulareListe(findeEinsatz(aktiverDetailEinsatzId));
                 }
                 if (aktiverFormularEinsatzId && $("dlgFormular").open) {
-                    var f = null;
-                    if (aktiverFormularEinsatzId === "direkt") {
-                        f = direktFormularObj;
-                    } else {
-                        var e = findeEinsatz(aktiverFormularEinsatzId);
-                        if (e && e.formulare) {
-                            f = e.formulare.find(function (item) { return item.id === aktiverFormularId; });
-                        }
-                    }
+                    var f = getAktivesFormularObjekt();
                     if (f) {
                         var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
                         $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
@@ -1951,6 +2231,69 @@
             });
         }
 
+        function renderDirektFormulareListe() {
+            var ziel = $("listeDirektFormulareGlobal");
+            ziel.textContent = "";
+            $("zaehlerDirektFormulare").textContent = direktFormulareListe.length;
+            $("zahlDirektFormularListe").textContent = direktFormulareListe.length;
+
+            if (!direktFormulareListe.length) {
+                var p = document.createElement("p");
+                p.className = "leer";
+                p.textContent = "Keine Ausfülldokumente vorhanden.";
+                ziel.appendChild(p);
+                return;
+            }
+
+            var darfSchreiben = kannInAktiverGruppeSchreiben();
+            direktFormulareListe.forEach(function (f, index) {
+                var item = document.createElement("div");
+                item.className = "formular-liste-item";
+
+                var links = document.createElement("div");
+                var titel = document.createElement("strong");
+                var patientTitel = f.patientName ? " (" + f.patientName + ")" : " (Unbenannt)";
+                titel.textContent = "Protokoll #" + (index + 1) + patientTitel;
+                links.appendChild(titel);
+
+                var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
+                var sub = document.createElement("div");
+                sub.style.fontSize = ".78rem";
+                sub.style.color = "#ffd28a";
+                sub.textContent = "Löschung in " + formatRestzeit(rest);
+                links.appendChild(sub);
+
+                item.appendChild(links);
+
+                var rechts = document.createElement("div");
+                rechts.style.display = "flex";
+                rechts.style.gap = ".4rem";
+
+                var btnOpen = document.createElement("button");
+                btnOpen.type = "button";
+                btnOpen.className = "btn-klein";
+                btnOpen.textContent = "Öffnen";
+                btnOpen.addEventListener("click", function () {
+                    oeffneDirektFormularDialog(f.id);
+                });
+                rechts.appendChild(btnOpen);
+
+                if (darfSchreiben) {
+                    var btnDel = document.createElement("button");
+                    btnDel.type = "button";
+                    btnDel.className = "btn-gefahr";
+                    btnDel.textContent = "Löschen";
+                    btnDel.addEventListener("click", function () {
+                        direktFormularManuellLoeschen(f.id);
+                    });
+                    rechts.appendChild(btnDel);
+                }
+
+                item.appendChild(rechts);
+                ziel.appendChild(item);
+            });
+        }
+
         function anzeigen() {
             if (aktiveGruppeId !== "standard" && !istMitgliedInAktiverGruppe()) {
                 $("zaehlerEinsaetze").textContent = "0";
@@ -1959,9 +2302,12 @@
                 $("zahlArchiv").textContent = "0";
                 $("zaehlerHelfer").textContent = "0";
                 $("zahlHelferListe").textContent = "0";
+                $("zaehlerDirektFormulare").textContent = "0";
+                $("zahlDirektFormularListe").textContent = "0";
                 $("listeLaufend").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
                 $("listeArchiv").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
                 $("listeHelferGlobal").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
+                $("listeDirektFormulareGlobal").innerHTML = '<p class="leer">Kein Zugriff auf diese Gruppe.</p>';
                 return;
             }
 
@@ -1970,9 +2316,12 @@
             $("zahlLaufend").textContent = n;
             $("zaehlerArchiv").textContent = a;
             $("zahlArchiv").textContent = a;
+            $("zaehlerDirektFormulare").textContent = direktFormulareListe.length;
+            
             liste("listeLaufend", daten.laufend, true, "Keine laufenden Einsätze.");
             liste("listeArchiv", daten.archiv, false, "Archiv ist leer.");
             renderGlobaleHelferListe();
+            renderDirektFormulareListe();
         }
 
         function meldung(text) { $("meldung").textContent = text; }
@@ -2283,15 +2632,29 @@
             var neuesForm = {
                 id: "form_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
                 erstelltAm: Date.now(),
-                raum: e.raum || "",
-                alarmzeit: uhrzeit(e.beginn),
                 patientName: "",
+                geburtsdatum: "",
                 patientKlasse: "",
-                helfer: getZugewieseneHelferNamen(e),
+                geschlecht: "",
+                einsatzart: "",
+                lfdSchuljahr: "",
+                datum: new Date().toLocaleDateString("de-DE"),
+                alarmzeit: uhrzeit(e.beginn),
+                entlasszeit: "",
+                ortTyp: "raum",
+                raum: e.raum || "",
                 meldebild: e.info || "",
+                koerperMarkierungen: [],
+                checkboxen: {},
+                atemzuege: "",
+                puls: "",
+                blutdruck: "",
+                temperatur: "",
                 massnahmen: "",
-                verbleib: "Zurück in den Unterricht",
-                entlasszeit: ""
+                verbleib: "",
+                elternUhr: "",
+                material: "",
+                helfer: getZugewieseneHelferNamen(e)
             };
             e.formulare.push(neuesForm);
             await datenSpeichern();
@@ -2299,50 +2662,112 @@
             return neuesForm;
         }
 
-        // Direktes Ausfülldokument über die Startseite öffnen
+        // --- DIREKT-FORMULARE LOGIK ÜBER DIE STARTSEITE ---
+
         $("kachelDirektFormular").addEventListener("click", function () {
-            direktFormularObj = {
-                id: "direkt_" + Date.now(),
-                erstelltAm: Date.now(),
-                raum: "",
-                alarmzeit: uhrzeit(Date.now()),
-                patientName: "",
-                patientKlasse: "",
-                helfer: getAktuellerAnzeigename(),
-                meldebild: "",
-                massnahmen: "",
-                verbleib: "Zurück in den Unterricht",
-                entlasszeit: ""
-            };
-            oeffneDirektFormularDialog();
+            zeigeAnsicht("direktFormulare");
+            renderDirektFormulareListe();
         });
 
-        var FORMULAR_FELD_IDS = ["fRaum", "fAlarmzeit", "fPatientName", "fPatientKlasse", "fHelfer", "fMeldebild", "fMassnahmen", "fVerbleib", "fEntlasszeit"];
+        $("neuesDirektFormularBtn").addEventListener("click", async function () {
+            if (!kannInAktiverGruppeSchreiben()) return;
+            var neuesForm = {
+                id: "dir_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+                erstelltAm: Date.now(),
+                patientName: "",
+                geburtsdatum: "",
+                patientKlasse: "",
+                geschlecht: "",
+                einsatzart: "",
+                lfdSchuljahr: "",
+                datum: new Date().toLocaleDateString("de-DE"),
+                alarmzeit: uhrzeit(Date.now()),
+                entlasszeit: "",
+                ortTyp: "raum",
+                raum: "",
+                meldebild: "",
+                koerperMarkierungen: [],
+                checkboxen: {},
+                atemzuege: "",
+                puls: "",
+                blutdruck: "",
+                temperatur: "",
+                massnahmen: "",
+                verbleib: "",
+                elternUhr: "",
+                material: "",
+                helfer: getAktuellerAnzeigename()
+            };
+            direktFormulareListe.push(neuesForm);
+            await datenSpeichern();
+            renderDirektFormulareListe();
+            oeffneDirektFormularDialog(neuesForm.id);
+        });
 
-        function oeffneDirektFormularDialog() {
-            if (!direktFormularObj) return;
+        function fülleFormularFelderAus(f) {
+            $("fPatientName").value = f.patientName || "";
+            $("fGeburtstag").value = f.geburtsdatum || "";
+            $("fPatientKlasse").value = f.patientKlasse || "";
+            $("fLfdSchuljahr").value = f.lfdSchuljahr || "";
+            $("fDatum").value = f.datum || "";
+            $("fAlarmzeit").value = f.alarmzeit || "";
+            $("fEntlasszeit").value = f.entlasszeit || "";
+            $("fRaum").value = f.raum || "";
+            $("fMeldebild").value = f.meldebild || "";
+            $("fAtemzuege").value = f.atemzuege || "";
+            $("fPuls").value = f.puls || "";
+            $("fBlutdruck").value = f.blutdruck || "";
+            $("fTemperatur").value = f.temperatur || "";
+            $("fMassnahmen").value = f.massnahmen || "";
+            $("fVerbleib").value = f.verbleib || "";
+            $("fElternUhr").value = f.elternUhr || "";
+            $("fMaterial").value = f.material || "";
+            $("fHelfer").value = f.helfer || "";
+
+            // Checkboxen wiederherstellen
+            document.querySelectorAll(".form-checkbox").forEach(function (cb) {
+                var field = cb.getAttribute("data-field");
+                var val = cb.getAttribute("data-val");
+                if (f.checkboxen && f.checkboxen[field] === val) {
+                    cb.classList.add("checked");
+                } else if (f.checkboxen && Array.isArray(f.checkboxen[field]) && f.checkboxen[field].indexOf(val) !== -1) {
+                    cb.classList.add("checked");
+                } else {
+                    cb.classList.remove("checked");
+                }
+            });
+
+            // Körpermarkierungen wiederherstellen
+            document.querySelectorAll(".koerper-teil").forEach(function (kt) {
+                var part = kt.getAttribute("data-part");
+                if (f.koerperMarkierungen && f.koerperMarkierungen.indexOf(part) !== -1) {
+                    kt.classList.add("rot");
+                } else {
+                    kt.classList.remove("rot");
+                }
+            });
+        }
+
+        function oeffneDirektFormularDialog(formId) {
+            var f = direktFormulareListe.find(function (item) { return item.id === formId; });
+            if (!f) return;
+
             aktiverFormularEinsatzId = "direkt";
-            aktiverFormularId = direktFormularObj.id;
+            aktiverFormularId = f.id;
+            aktivesDirektFormularId = f.id;
+            var nummer = direktFormulareListe.indexOf(f) + 1;
 
-            $("druckEinsatzId").textContent = "Direkt-Protokoll";
-            $("druckDatum").textContent = new Date().toLocaleDateString("de-DE");
+            $("druckEinsatzId").textContent = "Protokoll #" + nummer;
+            $("druckDatum").textContent = f.datum || new Date(f.erstelltAm).toLocaleDateString("de-DE");
 
-            $("fRaum").value = direktFormularObj.raum;
-            $("fAlarmzeit").value = direktFormularObj.alarmzeit;
-            $("fPatientName").value = direktFormularObj.patientName;
-            $("fPatientKlasse").value = direktFormularObj.patientKlasse;
-            $("fHelfer").value = direktFormularObj.helfer;
-            $("fMeldebild").value = direktFormularObj.meldebild;
-            $("fMassnahmen").value = direktFormularObj.massnahmen;
-            $("fVerbleib").value = direktFormularObj.verbleib;
-            $("fEntlasszeit").value = direktFormularObj.entlasszeit;
+            fülleFormularFelderAus(f);
 
-            FORMULAR_FELD_IDS.forEach(function (id) { $(id).disabled = false; });
-
-            $("formularDialogTitel").textContent = "Ausfülldokument (Direkt)";
+            var schreibgeschuetzt = !kannInAktiverGruppeSchreiben();
+            $("formularDialogTitel").textContent = "Ausfülldokument #" + nummer;
             $("formularSchreibschutzHinweis").hidden = true;
-            $("btnFormularSchliessen").textContent = "Schließen";
-            var rest = FORMULAR_TTL_MS - (Date.now() - direktFormularObj.erstelltAm);
+            $("btnFormularSchliessen").textContent = schreibgeschuetzt ? "Schließen" : "Speichern & Schließen";
+
+            var rest = FORMULAR_TTL_MS - (Date.now() - f.erstelltAm);
             $("formularCountdown").textContent = "Löschung in " + formatRestzeit(rest);
             $("dlgFormular").showModal();
         }
@@ -2355,22 +2780,13 @@
 
             aktiverFormularEinsatzId = e.id;
             aktiverFormularId = f.id;
+            aktivesDirektFormularId = null;
             var nummer = e.formulare.indexOf(f) + 1;
 
             $("druckEinsatzId").textContent = "#" + e.id + "-" + nummer;
             $("druckDatum").textContent = new Date(e.beginn).toLocaleDateString("de-DE");
 
-            $("fRaum").value = f.raum;
-            $("fAlarmzeit").value = f.alarmzeit;
-            $("fPatientName").value = f.patientName;
-            $("fPatientKlasse").value = f.patientKlasse;
-            $("fHelfer").value = f.helfer || getZugewieseneHelferNamen(e);
-            $("fMeldebild").value = f.meldebild;
-            $("fMassnahmen").value = f.massnahmen;
-            $("fVerbleib").value = f.verbleib;
-            $("fEntlasszeit").value = f.entlasszeit;
-
-            FORMULAR_FELD_IDS.forEach(function (id) { $(id).disabled = schreibgeschuetzt; });
+            fülleFormularFelderAus(f);
 
             $("formularDialogTitel").textContent = schreibgeschuetzt ? "Protokoll #" + nummer + " (Schreibgeschützt)" : "Protokoll #" + nummer;
             $("formularSchreibschutzHinweis").hidden = !schreibgeschuetzt;
@@ -2382,50 +2798,69 @@
         }
 
         function speichereFormularEingaben() {
-            if (!aktiverFormularEinsatzId || !aktiverFormularId) return;
-
-            if (aktiverFormularEinsatzId === "direkt") {
-                if (!direktFormularObj) return;
-                direktFormularObj.raum = $("fRaum").value;
-                direktFormularObj.alarmzeit = $("fAlarmzeit").value;
-                direktFormularObj.patientName = $("fPatientName").value;
-                direktFormularObj.patientKlasse = $("fPatientKlasse").value;
-                direktFormularObj.helfer = $("fHelfer").value;
-                direktFormularObj.meldebild = $("fMeldebild").value;
-                direktFormularObj.massnahmen = $("fMassnahmen").value;
-                direktFormularObj.verbleib = $("fVerbleib").value;
-                direktFormularObj.entlasszeit = $("fEntlasszeit").value;
-                return;
-            }
-
-            if (istEinsatzBeendet(aktiverFormularEinsatzId) || !kannInAktiverGruppeSchreiben()) return;
-            var e = findeEinsatz(aktiverFormularEinsatzId);
-            if (!e || !e.formulare) return;
-            var f = e.formulare.find(function (item) { return item.id === aktiverFormularId; });
+            var f = getAktivesFormularObjekt();
             if (!f) return;
+            if (aktiverFormularEinsatzId !== "direkt" && istEinsatzBeendet(aktiverFormularEinsatzId)) return;
+            if (!kannInAktiverGruppeSchreiben()) return;
 
-            f.raum = $("fRaum").value;
-            f.alarmzeit = $("fAlarmzeit").value;
             f.patientName = $("fPatientName").value;
+            f.geburtsdatum = $("fGeburtstag").value;
             f.patientKlasse = $("fPatientKlasse").value;
-            f.helfer = $("fHelfer").value;
+            f.lfdSchuljahr = $("fLfdSchuljahr").value;
+            f.datum = $("fDatum").value;
+            f.alarmzeit = $("fAlarmzeit").value;
+            f.entlasszeit = $("fEntlasszeit").value;
+            f.raum = $("fRaum").value;
             f.meldebild = $("fMeldebild").value;
+            f.atemzuege = $("fAtemzuege").value;
+            f.puls = $("fPuls").value;
+            f.blutdruck = $("fBlutdruck").value;
+            f.temperatur = $("fTemperatur").value;
             f.massnahmen = $("fMassnahmen").value;
             f.verbleib = $("fVerbleib").value;
-            f.entlasszeit = $("fEntlasszeit").value;
+            f.elternUhr = $("fElternUhr").value;
+            f.material = $("fMaterial").value;
+            f.helfer = $("fHelfer").value;
+
+            // Checkboxen sammeln
+            f.checkboxen = {};
+            document.querySelectorAll(".form-checkbox.checked").forEach(function (cb) {
+                var field = cb.getAttribute("data-field");
+                var val = cb.getAttribute("data-val");
+                if (field === "geschlecht" || field === "einsatzart" || field === "ortTyp") {
+                    f.checkboxen[field] = val;
+                } else {
+                    if (!Array.isArray(f.checkboxen[field])) f.checkboxen[field] = [];
+                    f.checkboxen[field].push(val);
+                }
+            });
+
+            // Körpermarkierungen sammeln
+            f.koerperMarkierungen = [];
+            document.querySelectorAll(".koerper-teil.rot").forEach(function (kt) {
+                f.koerperMarkierungen.push(kt.getAttribute("data-part"));
+            });
+
             datenSpeichern();
         }
 
-        async function formularManuellLoeschen(einsatzId, formId) {
-            if (einsatzId === "direkt") {
-                direktFormularObj = null;
+        async function direktFormularManuellLoeschen(formId) {
+            if (!kannInAktiverGruppeSchreiben()) return;
+            direktFormulareListe = direktFormulareListe.filter(function (item) { return item.id !== formId; });
+            await datenSpeichern();
+            renderDirektFormulareListe();
+            anzeigen();
+
+            if ($("dlgFormular").open && aktiverFormularId === formId) {
                 $("dlgFormular").close();
                 aktiverFormularEinsatzId = null;
                 aktiverFormularId = null;
-                meldung("Formular gelöscht.");
-                return;
+                aktivesDirektFormularId = null;
             }
+            meldung("Protokoll gelöscht.");
+        }
 
+        async function formularManuellLoeschen(einsatzId, formId) {
             if (!kannInAktiverGruppeSchreiben()) return;
             var e = findeEinsatz(einsatzId);
             if (!e || !e.formulare) return;
@@ -2446,31 +2881,36 @@
 
         // Nur Drucken (ohne automatisches Löschen)
         $("btnNurDrucken").addEventListener("click", function () {
-            if (aktiverFormularEinsatzId && aktiverFormularEinsatzId !== "direkt" && !istEinsatzBeendet(aktiverFormularEinsatzId) && kannInAktiverGruppeSchreiben()) {
-                speichereFormularEingaben();
-            }
+            speichereFormularEingaben();
             window.print();
         });
 
         $("btnFormularSchliessen").addEventListener("click", function () {
-            if (aktiverFormularEinsatzId === "direkt") {
-                $("dlgFormular").close();
-                aktiverFormularEinsatzId = null;
-                aktiverFormularId = null;
-                return;
-            }
-
-            var schreibgeschuetzt = aktiverFormularEinsatzId ? (istEinsatzBeendet(aktiverFormularEinsatzId) || !kannInAktiverGruppeSchreiben()) : false;
-            if (!schreibgeschuetzt) speichereFormularEingaben();
+            speichereFormularEingaben();
             $("dlgFormular").close();
-            if (aktiverDetailEinsatzId) renderEinsatzFormulareListe(findeEinsatz(aktiverDetailEinsatzId));
+            if (aktiverFormularEinsatzId === "direkt") {
+                renderDirektFormulareListe();
+            } else if (aktiverDetailEinsatzId) {
+                renderEinsatzFormulareListe(findeEinsatz(aktiverDetailEinsatzId));
+            }
             aktiverFormularEinsatzId = null;
             aktiverFormularId = null;
+            aktivesDirektFormularId = null;
         });
 
-        FORMULAR_FELD_IDS.forEach(function (id) {
-            $(id).addEventListener("input", speichereFormularEingaben);
-            $(id).addEventListener("change", speichereFormularEingaben);
+        // Eventlistener für alle Formular-Inputs zum Live-Speichern
+        var FORMULAR_INPUT_IDS = [
+            "fPatientName", "fGeburtstag", "fPatientKlasse", "fLfdSchuljahr", "fDatum", 
+            "fAlarmzeit", "fEntlasszeit", "fRaum", "fMeldebild", "fAtemzuege", 
+            "fPuls", "fBlutdruck", "fTemperatur", "fMassnahmen", "fVerbleib", 
+            "fElternUhr", "fMaterial", "fHelfer"
+        ];
+        FORMULAR_INPUT_IDS.forEach(function (id) {
+            var el = $(id);
+            if (el) {
+                el.addEventListener("input", speichereFormularEingaben);
+                el.addEventListener("change", speichereFormularEingaben);
+            }
         });
 
         async function einsatzBeenden(id) {
@@ -2570,8 +3010,10 @@
         function zeigeAnsicht(welche) {
             $("ansichtEinsaetze").hidden = (welche !== "einsaetze");
             $("ansichtHelfer").hidden = (welche !== "helfer");
+            $("ansichtDirektFormulare").hidden = (welche !== "direktFormulare");
             $("kachelEinsaetze").classList.toggle("aktiv", welche === "einsaetze");
             $("kachelHelfer").classList.toggle("aktiv", welche === "helfer");
+            $("kachelDirektFormular").classList.toggle("aktiv", welche === "direktFormulare");
         }
 
         $("kachelEinsaetze").addEventListener("click", function () {
@@ -2585,6 +3027,10 @@
         });
 
         $("zurueckZuEinsaetzen").addEventListener("click", function () {
+            zeigeAnsicht("einsaetze");
+        });
+
+        $("zurueckZuEinsaetzenVonFormularen").addEventListener("click", function () {
             zeigeAnsicht("einsaetze");
         });
 
