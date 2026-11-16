@@ -46,7 +46,7 @@
             font-family: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
             color: var(--d-text);
             background: var(--d-grund);
-            line-height: 1.5;
+            line-height: 1.4;
             -webkit-text-size-adjust: 100%;
         }
         body.dunkel { background: var(--d-grund); color: var(--d-text); }
@@ -284,40 +284,40 @@
             padding: .6rem .75rem; margin-bottom: .45rem;
         }
 
-        /* --- STYLING DES PROTOKOLLS (OPTIMIERT FÜR 1:1 FOTO-OPTIK & TOUCH) --- */
+        /* --- STYLING DES PROTOKOLLS (KOMPAKT FÜR DIN A4 DRUCK) --- */
         .protokoll-form {
-            background: #ffffff; border: 1.5px solid #000000; border-radius: 4px;
-            padding: 0.75rem; color: #000000; font-size: 0.86rem;
+            background: #ffffff; border: 1px solid #000000; border-radius: 4px;
+            padding: 8px; color: #000000; font-size: 7.8pt;
         }
         .protokoll-sektion {
-            border: 1px solid #000000; border-radius: 3px; padding: 8px; margin-bottom: 8px; background: #ffffff;
+            border: 1px solid #000000; border-radius: 2px; padding: 5px; margin-bottom: 5px; background: #ffffff;
         }
         .protokoll-sektion-titel {
-            font-weight: 700; background: #e6e6e6; padding: 4px 8px; margin: -8px -8px 8px -8px; border-bottom: 1px solid #000000;
-            font-size: 0.88rem; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700; background: #e6e6e6; padding: 3px 6px; margin: -5px -5px 5px -5px; border-bottom: 1px solid #000000;
+            font-size: 8pt; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
-        /* Touch-freundliche Checkboxen */
+        /* Touch-freundliche Checkboxen in kompakter Druckform */
         .form-checkbox {
-            display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
-            margin-right: 10px; margin-bottom: 3px; padding: 2px 4px; border-radius: 3px;
-            background: rgba(0, 0, 0, 0.02); min-height: 32px; font-size: 0.84rem;
+            display: inline-flex; align-items: center; gap: 4px; cursor: pointer; user-select: none;
+            margin-right: 8px; margin-bottom: 2px; padding: 1px 3px; border-radius: 2px;
+            background: rgba(0, 0, 0, 0.02); min-height: 24px; font-size: 7.8pt;
         }
         .form-checkbox:hover { background: rgba(0, 0, 0, 0.06); }
         .form-checkbox .box-box {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 18px; height: 18px; border: 1.5px solid #000000; background: #ffffff; border-radius: 3px;
-            font-size: 13px; font-weight: bold; color: #000000; flex: none;
+            width: 14px; height: 14px; border: 1px solid #000000; background: #ffffff; border-radius: 2px;
+            font-size: 11px; font-weight: bold; color: #000000; flex: none;
         }
         .form-checkbox.checked .box-box::after { content: "☒"; }
         .form-checkbox:not(.checked) .box-box::after { content: "☐"; opacity: 0.4; }
 
-        /* Interaktive Körperteile */
+        /* Kompakte interaktive Körperteile für den Druck auf 1 Seite */
         .koerper-container {
-            display: flex; justify-content: center; gap: 1rem; align-items: center; margin: 0.5rem 0;
+            display: flex; justify-content: center; gap: 0.75rem; align-items: center; margin: 0.2rem 0;
         }
         .koerper-figur {
-            width: 85px; height: 155px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 4px; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 60px; height: 110px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .koerper-teil {
             cursor: pointer; fill: #dcdcdc; stroke: #333; stroke-width: 1; transition: fill 0.15s, transform 0.1s;
@@ -325,15 +325,16 @@
         .koerper-teil:active { transform: scale(0.97); }
         .koerper-teil.rot { fill: var(--rot) !important; stroke: #000 !important; }
 
-        /* Formular Eingabefelder im Foto-Look */
+        /* Eingabefelder im kompakten Foto-Look */
         .protokoll-form input, .protokoll-form textarea, .protokoll-form select {
-            background: #fff !important; color: #000 !important; border: 1px solid #777 !important; border-radius: 3px; padding: 4px 6px; font-size: 16px; margin-bottom: 4px;
+            background: #fff !important; color: #000 !important; border: 1px solid #666 !important; border-radius: 2px; padding: 2px 4px; font-size: 16px; margin-bottom: 3px;
         }
-        .protokoll-form label { color: #000 !important; font-weight: 600; font-size: 0.8rem; }
+        .protokoll-form textarea { resize: none; }
+        .protokoll-form label { color: #000 !important; font-weight: 600; font-size: 7.5pt; }
 
-        .formular-kopf-druck { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8px; }
+        .formular-kopf-druck { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; }
         .druck-sperrvermerk {
-            display: block; margin-top: 6px; padding: 4px; border: 1px solid #000; font-size: 7.5pt; font-weight: bold; text-align: center; text-transform: uppercase; background: #f0f0f0; color: #000;
+            display: block; margin-top: 4px; padding: 2px; border: 1px solid #000; font-size: 6.8pt; font-weight: bold; text-align: center; text-transform: uppercase; background: #f0f0f0; color: #000;
         }
 
         @media (max-width: 768px) {
@@ -346,7 +347,7 @@
         }
 
         @media print {
-            @page { margin: 6mm; size: A4 portrait; }
+            @page { margin: 4mm; size: A4 portrait; }
             body * { visibility: hidden; }
             #dlgFormular, #dlgFormular * { visibility: visible; }
             #dlgFormular {
@@ -354,7 +355,7 @@
                 margin: 0; padding: 0; border: 0; background: #ffffff !important;
                 color: #000000 !important; box-shadow: none; max-height: none; overflow: visible !important;
             }
-            .protokoll-form { background: #ffffff !important; border: 1px solid #000000 !important; color: #000000 !important; padding: 2mm; font-size: 8pt; }
+            .protokoll-form { background: #ffffff !important; border: 1px solid #000000 !important; color: #000000 !important; padding: 2mm; font-size: 7.5pt; }
             .kein-druck { display: none !important; }
         }
     </style>
@@ -598,7 +599,7 @@
         <div id="formEinsatz">
             <h3>Neuer Einsatz</h3>
             <label for="eRaum">Raum / Ort</label>
-            <input id="eRaum" type="text" placeholder="Ort/Raum" autocomplete="off">
+            <input id="eRaum" type="text" placeholder="Z.B. Sporthalle" autocomplete="off">
             <label for="eInfo">Kurze Informationen (optional)</label>
             <textarea id="eInfo" rows="2" placeholder="Was ist passiert?"></textarea>
             <p class="dlg-fehler" id="eFehler" role="alert"></p>
@@ -702,22 +703,22 @@
             <div class="protokoll-form">
                 <div class="formular-kopf-druck">
                     <div>
-                        <strong style="font-size:1.1rem; color:#000;">Schulsanitätsdienst</strong><br>
-                        <span style="color:#333;">Einsatzprotokoll (Vertraulich)</span>
+                        <strong style="font-size:1.05rem; color:#000;">Schulsanitätsdienst</strong><br>
+                        <span style="color:#333; font-size:7.5pt;">Einsatzprotokoll (Vertraulich)</span>
                     </div>
-                    <div style="text-align:right; font-size:.8rem; color:#000;">
+                    <div style="text-align:right; font-size:7.5pt; color:#000;">
                         <strong>Protokoll-Nr.:</strong> <span id="druckEinsatzId"></span><br>
                         <strong>Datum:</strong> <span id="druckDatum"></span>
                     </div>
                 </div>
 
                 <!-- Kopfbereich: Betroffene*r & Einsatz -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Betroffene*r</div>
                         <label>Vorname / Name:</label>
                         <input id="fPatientName" type="text" placeholder="Name, Vorname">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
                             <div>
                                 <label>Geburtsdatum:</label>
                                 <input id="fGeburtstag" type="text" placeholder="TT.MM.JJJJ">
@@ -727,7 +728,7 @@
                                 <input id="fPatientKlasse" type="text" placeholder="Klasse">
                             </div>
                         </div>
-                        <div style="margin-top:6px;">
+                        <div style="margin-top:4px;">
                             <label>Geschlecht:</label>
                             <span class="form-checkbox" data-field="geschlecht" data-val="m"><span class="box-box"></span> m</span>
                             <span class="form-checkbox" data-field="geschlecht" data-val="w"><span class="box-box"></span> w</span>
@@ -737,7 +738,7 @@
 
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Einsatz</div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
                             <div>
                                 <label>Einsatzart:</label>
                                 <span class="form-checkbox" data-field="einsatzart" data-val="chirurgisch"><span class="box-box"></span> chirurgisch</span><br>
@@ -748,70 +749,58 @@
                                 <input id="fLfdSchuljahr" type="text" placeholder="Nr. / Jahr">
                             </div>
                         </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:4px;">
                             <div>
                                 <label>Datum:</label>
                                 <input id="fDatum" type="text" placeholder="TT.MM.JJJJ">
                             </div>
                             <div>
                                 <label>Anfangs- / Endzeit:</label>
-                                <div style="display:flex; gap:4px;">
+                                <div style="display:flex; gap:3px;">
                                     <input id="fAlarmzeit" type="text" placeholder="Beginn">
                                     <input id="fEntlasszeit" type="text" placeholder="Ende">
                                 </div>
                             </div>
                         </div>
-                        <div style="margin-top:6px;">
+                        <div style="margin-top:4px;">
                             <label>Einsatzort:</label>
                             <span class="form-checkbox" data-field="ortTyp" data-val="raum"><span class="box-box"></span> SSD-Raum</span>
-                            <input id="fRaum" type="text" placeholder="Anderer Ort / Raum" style="margin-top:4px;">
+                            <input id="fRaum" type="text" placeholder="Anderer Ort / Raum" style="margin-top:2px;">
                         </div>
                     </div>
                 </div>
 
                 <!-- Mitte: Anamnese & Messwerte -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin-bottom: 8px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 5px; margin-bottom: 5px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Anamnese / Unfallhergang</div>
-                        <textarea id="fMeldebild" rows="4" placeholder="Unfallhergang / Krankengeschichte..."></textarea>
+                        <textarea id="fMeldebild" rows="3" placeholder="Unfallhergang / Krankengeschichte..."></textarea>
                         
-                        <div style="font-size:0.8rem; margin-top:4px; font-weight:700; text-align:center; color:#000;">Körper-Schema (Antippen zum Markieren):</div>
+                        <div style="font-size:7.5pt; margin-top:2px; font-weight:700; text-align:center; color:#000;">Körper-Schema (Antippen zum Markieren):</div>
                         <div class="koerper-container">
                             <!-- Figur 1 (Vorderseite) -->
                             <div class="koerper-figur">
-                                <svg width="70" height="140" viewBox="0 0 100 200">
-                                    <!-- Kopf -->
+                                <svg width="55" height="100" viewBox="0 0 100 200">
                                     <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig1_kopf"/>
-                                    <!-- Rumpf -->
                                     <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig1_rumpf"/>
-                                    <!-- Linker Arm -->
                                     <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig1_l_arm"/>
-                                    <!-- Rechter Arm -->
                                     <path d="M70 41 L83 41 L83 92 L70 92 Z" class="koerper-teil" data-part="fig1_r_arm"/>
-                                    <!-- Linkes Bein -->
                                     <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig1_l_bein"/>
-                                    <!-- Rechtes Bein -->
                                     <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig1_r_bein"/>
                                 </svg>
-                                <small style="color:#555; margin-top:1px;">Vorderseite</small>
+                                <small style="color:#555; font-size:6.5pt;">Vorderseite</small>
                             </div>
                             <!-- Figur 2 (Rückseite) -->
                             <div class="koerper-figur">
-                                <svg width="70" height="140" viewBox="0 0 100 200">
-                                    <!-- Kopf -->
+                                <svg width="55" height="100" viewBox="0 0 100 200">
                                     <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig2_kopf"/>
-                                    <!-- Rücken -->
                                     <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig2_ruecken"/>
-                                    <!-- Linker Arm -->
                                     <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig2_l_arm"/>
-                                    <!-- Rechter Arm -->
                                     <path d="M70 41 L83 41 L83 92 L70 92 Z" class="koerper-teil" data-part="fig2_r_arm"/>
-                                    <!-- Linkes Bein -->
                                     <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig2_l_bein"/>
-                                    <!-- Rechtes Bein -->
                                     <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig2_r_bein"/>
                                 </svg>
-                                <small style="color:#555; margin-top:1px;">Rückseite</small>
+                                <small style="color:#555; font-size:6.5pt;">Rückseite</small>
                             </div>
                         </div>
                     </div>
@@ -819,7 +808,7 @@
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Messwerte &amp; Vitalfunktionen</div>
                         
-                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size:0.83rem;">
+                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size:7.5pt;">
                             <div>
                                 <strong>Bewusstsein:</strong><br>
                                 <span class="form-checkbox" data-field="bew_1" data-val="wach"><span class="box-box"></span> wach, orientiert</span><br>
@@ -831,25 +820,25 @@
                                 <span class="form-checkbox" data-field="atm_1" data-val="unauffaellig"><span class="box-box"></span> unauffällig</span><br>
                                 <span class="form-checkbox" data-field="atm_1" data-val="atembeschwerden"><span class="box-box"></span> Atembeschwerden</span><br>
                                 <span class="form-checkbox" data-field="atm_1" data-val="hyperventilation"><span class="box-box"></span> Hyperventilation</span>
-                                <input id="fAtemzuege" type="text" placeholder="Atemzüge/min" style="margin-top:2px;">
+                                <input id="fAtemzuege" type="text" placeholder="Atemzüge/min" style="margin-top:1px;">
                             </div>
                         </div>
 
-                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; font-size:0.83rem;">
+                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 3px; font-size:7.5pt;">
                             <div>
                                 <label>Puls / Regelmäßigkeit:</label>
-                                <input id="fPuls" type="text" placeholder="Puls /min" style="margin-bottom:3px;">
+                                <input id="fPuls" type="text" placeholder="Puls /min" style="margin-bottom:2px;">
                                 <span class="form-checkbox" data-field="puls_reg" data-val="ja"><span class="box-box"></span> regelm. ja</span>
                                 <span class="form-checkbox" data-field="puls_reg" data-val="nein"><span class="box-box"></span> nein</span>
                             </div>
                             <div>
                                 <label>Blutdruck / Temp:</label>
-                                <input id="fBlutdruck" type="text" placeholder="RR mmHg" style="margin-bottom:3px;">
+                                <input id="fBlutdruck" type="text" placeholder="RR mmHg" style="margin-bottom:2px;">
                                 <input id="fTemperatur" type="text" placeholder="°C Temp">
                             </div>
                         </div>
 
-                        <div style="margin-top:4px; font-size:0.83rem;">
+                        <div style="margin-top:3px; font-size:7.5pt;">
                             <strong>Pupillen:</strong><br>
                             <span class="form-checkbox" data-field="pupillen" data-val="normal"><span class="box-box"></span> normal</span>
                             <span class="form-checkbox" data-field="pupillen" data-val="ungleich"><span class="box-box"></span> ungleich</span>
@@ -857,9 +846,9 @@
                             <span class="form-checkbox" data-field="pupillen" data-val="verkleinert"><span class="box-box"></span> verkleinert</span>
                         </div>
 
-                        <div style="margin-top:4px; font-size:0.83rem;">
+                        <div style="margin-top:3px; font-size:7.5pt;">
                             <strong>Schmerzen (Skala 0-10):</strong>
-                            <div style="display:flex; gap:1px; flex-wrap:wrap; margin-top:2px;">
+                            <div style="display:flex; gap:1px; flex-wrap:wrap; margin-top:1px;">
                                 <span class="form-checkbox" data-field="schmerz" data-val="0"><span class="box-box"></span> 0</span>
                                 <span class="form-checkbox" data-field="schmerz" data-val="1"><span class="box-box"></span> 1</span>
                                 <span class="form-checkbox" data-field="schmerz" data-val="2"><span class="box-box"></span> 2</span>
@@ -877,7 +866,7 @@
                 </div>
 
                 <!-- Maßnahmen & Lagerung -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Maßnahmen</div>
                         <span class="form-checkbox" data-field="massn" data-val="wund"><span class="box-box"></span> Wundversorgung</span>
@@ -886,7 +875,7 @@
                         <span class="form-checkbox" data-field="massn" data-val="waerme"><span class="box-box"></span> Eigenwärmeerhalt</span>
                         <span class="form-checkbox" data-field="massn" data-val="beobachtung"><span class="box-box"></span> Ruhe/Beobachtung</span>
                         <span class="form-checkbox" data-field="massn" data-val="zucker"><span class="box-box"></span> Traubenzucker / Getränke</span>
-                        <textarea id="fMassnahmen" rows="2" placeholder="Weitere Maßnahmen..." style="margin-top:4px;"></textarea>
+                        <textarea id="fMassnahmen" rows="2" placeholder="Weitere Maßnahmen..." style="margin-top:2px;"></textarea>
                     </div>
 
                     <div class="protokoll-sektion" style="margin-bottom:0;">
@@ -901,23 +890,23 @@
                 </div>
 
                 <!-- Weiterversorgung & Verbrauchtes Material -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Weiterversorgung &amp; Übergabe</div>
                         <label>Sorgeberechtigte informiert:</label>
                         <span class="form-checkbox" data-field="eltern" data-val="ja"><span class="box-box"></span> ja</span>
                         <span class="form-checkbox" data-field="eltern" data-val="nicht_erreicht"><span class="box-box"></span> nicht erreicht</span>
-                        <input id="fElternUhr" type="text" placeholder="Um Uhrzeit" style="margin-top:2px;">
+                        <input id="fElternUhr" type="text" placeholder="Um Uhrzeit" style="margin-top:1px;">
 
-                        <label style="margin-top:4px;">Übergabe an:</label>
+                        <label style="margin-top:2px;">Übergabe an:</label>
                         <span class="form-checkbox" data-field="uebergabe" data-val="unterricht"><span class="box-box"></span> Unterricht</span>
                         <span class="form-checkbox" data-field="uebergabe" data-val="eltern"><span class="box-box"></span> Sorgeberechtigte</span>
                         <span class="form-checkbox" data-field="uebergabe" data-val="rettungsdienst"><span class="box-box"></span> Rettungsdienst / Notarzt</span>
 
-                        <label style="margin-top:4px;">Transportziel / Verbleib:</label>
+                        <label style="margin-top:2px;">Transportziel / Verbleib:</label>
                         <input id="fVerbleib" type="text" placeholder="Nach Hause / Praxis / Krankenhaus">
 
-                        <label style="margin-top:2px;">Zustandsverlauf:</label>
+                        <label style="margin-top:1px;">Zustandsverlauf:</label>
                         <span class="form-checkbox" data-field="verlauf" data-val="verbessert"><span class="box-box"></span> verbessert</span>
                         <span class="form-checkbox" data-field="verlauf" data-val="unveraendert"><span class="box-box"></span> unverändert</span>
                         <span class="form-checkbox" data-field="verlauf" data-val="verschlechtert"><span class="box-box"></span> verschlechtert</span>
@@ -925,12 +914,12 @@
 
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Verbrauchtes Material &amp; Team</div>
-                        <textarea id="fMaterial" rows="2" placeholder="Verbrauchtes Material..." style="margin-bottom:6px;"></textarea>
+                        <textarea id="fMaterial" rows="2" placeholder="Verbrauchtes Material..." style="margin-bottom:4px;"></textarea>
                         
                         <label>Schulsanitätsteam / Protokollführer*in:</label>
                         <input id="fHelfer" type="text" placeholder="Namen der Sanitäter">
 
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:4px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:2px;">
                             <div>
                                 <label>Unterschrift Sanitäter:</label>
                                 <input type="text" placeholder="Unterschrift">
@@ -2079,7 +2068,6 @@
             return new Date(ms).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
         }
 
-        // --- HELFER IM EINSATZ DIALOG (FÜRS ARCHIV) ---
         function oeffneHelferImEinsatzDialog(einsatzId) {
             var e = findeEinsatz(einsatzId);
             if (!e) return;
