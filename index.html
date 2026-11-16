@@ -284,40 +284,40 @@
             padding: .6rem .75rem; margin-bottom: .45rem;
         }
 
-        /* --- STYLING DES PROTOKOLLS (KOMPAKT FÜR DIN A4 DRUCK) --- */
+        /* --- STYLING DES PROTOKOLLS (KOMPAKT FÜR DIN A4 DRUCK & ANORDNUNG) --- */
         .protokoll-form {
             background: #ffffff; border: 1px solid #000000; border-radius: 4px;
-            padding: 8px; color: #000000; font-size: 7.8pt;
+            padding: 8px; color: #000000; font-size: 7.6pt;
         }
         .protokoll-sektion {
-            border: 1px solid #000000; border-radius: 2px; padding: 5px; margin-bottom: 5px; background: #ffffff;
+            border: 1px solid #000000; border-radius: 2px; padding: 4px 5px; margin-bottom: 4px; background: #ffffff;
         }
         .protokoll-sektion-titel {
-            font-weight: 700; background: #e6e6e6; padding: 3px 6px; margin: -5px -5px 5px -5px; border-bottom: 1px solid #000000;
-            font-size: 8pt; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700; background: #e6e6e6; padding: 2px 5px; margin: -4px -5px 4px -5px; border-bottom: 1px solid #000000;
+            font-size: 7.8pt; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         /* Touch-freundliche Checkboxen in kompakter Druckform */
         .form-checkbox {
-            display: inline-flex; align-items: center; gap: 4px; cursor: pointer; user-select: none;
-            margin-right: 8px; margin-bottom: 2px; padding: 1px 3px; border-radius: 2px;
-            background: rgba(0, 0, 0, 0.02); min-height: 24px; font-size: 7.8pt;
+            display: inline-flex; align-items: center; gap: 3px; cursor: pointer; user-select: none;
+            margin-right: 6px; margin-bottom: 2px; padding: 1px 2px; border-radius: 2px;
+            background: rgba(0, 0, 0, 0.02); min-height: 22px; font-size: 7.6pt;
         }
         .form-checkbox:hover { background: rgba(0, 0, 0, 0.06); }
         .form-checkbox .box-box {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 14px; height: 14px; border: 1px solid #000000; background: #ffffff; border-radius: 2px;
-            font-size: 11px; font-weight: bold; color: #000000; flex: none;
+            width: 13px; height: 13px; border: 1px solid #000000; background: #ffffff; border-radius: 2px;
+            font-size: 10px; font-weight: bold; color: #000000; flex: none;
         }
         .form-checkbox.checked .box-box::after { content: "☒"; }
         .form-checkbox:not(.checked) .box-box::after { content: "☐"; opacity: 0.4; }
 
         /* Kompakte interaktive Körperteile für den Druck auf 1 Seite */
         .koerper-container {
-            display: flex; justify-content: center; gap: 0.75rem; align-items: center; margin: 0.2rem 0;
+            display: flex; justify-content: center; gap: 0.5rem; align-items: center; margin: 0.1rem 0;
         }
         .koerper-figur {
-            width: 60px; height: 110px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 52px; height: 95px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .koerper-teil {
             cursor: pointer; fill: #dcdcdc; stroke: #333; stroke-width: 1; transition: fill 0.15s, transform 0.1s;
@@ -327,14 +327,14 @@
 
         /* Eingabefelder im kompakten Foto-Look */
         .protokoll-form input, .protokoll-form textarea, .protokoll-form select {
-            background: #fff !important; color: #000 !important; border: 1px solid #666 !important; border-radius: 2px; padding: 2px 4px; font-size: 16px; margin-bottom: 3px;
+            background: #fff !important; color: #000 !important; border: 1px solid #666 !important; border-radius: 2px; padding: 1px 3px; font-size: 16px; margin-bottom: 2px;
         }
         .protokoll-form textarea { resize: none; }
-        .protokoll-form label { color: #000 !important; font-weight: 600; font-size: 7.5pt; }
+        .protokoll-form label { color: #000 !important; font-weight: 600; font-size: 7.2pt; }
 
-        .formular-kopf-druck { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 5px; }
+        .formular-kopf-druck { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #000; padding-bottom: 2px; margin-bottom: 4px; }
         .druck-sperrvermerk {
-            display: block; margin-top: 4px; padding: 2px; border: 1px solid #000; font-size: 6.8pt; font-weight: bold; text-align: center; text-transform: uppercase; background: #f0f0f0; color: #000;
+            display: block; margin-top: 3px; padding: 2px; border: 1px solid #000; font-size: 6.5pt; font-weight: bold; text-align: center; text-transform: uppercase; background: #f0f0f0; color: #000;
         }
 
         @media (max-width: 768px) {
@@ -347,15 +347,31 @@
         }
 
         @media print {
-            @page { margin: 4mm; size: A4 portrait; }
-            body * { visibility: hidden; }
-            #dlgFormular, #dlgFormular * { visibility: visible; }
+            @page { size: A4 portrait; margin: 4mm 6mm; }
+            body * { visibility: hidden !important; }
+            #dlgFormular, #dlgFormular * { visibility: visible !important; }
             #dlgFormular {
-                position: fixed; left: 0; top: 0; width: 100%; max-width: 100%;
-                margin: 0; padding: 0; border: 0; background: #ffffff !important;
-                color: #000000 !important; box-shadow: none; max-height: none; overflow: visible !important;
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                width: 100% !important; max-width: 100% !important; height: auto !important;
+                max-height: none !important; margin: 0 !important; padding: 0 !important;
+                border: 0 !important; background: #ffffff !important;
+                color: #000000 !important; box-shadow: none !important; overflow: visible !important;
             }
-            .protokoll-form { background: #ffffff !important; border: 1px solid #000000 !important; color: #000000 !important; padding: 2mm; font-size: 7.5pt; }
+            .protokoll-form {
+                background: #ffffff !important; border: 1px solid #000000 !important;
+                color: #000000 !important; padding: 2mm !important; font-size: 7.2pt !important; width: 100% !important;
+            }
+            /* Erzwingt exakt die 2-Spalten-Grid-Anordnung auch im Druck */
+            .protokoll-form .grid-mobil-2 {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+            }
+            .protokoll-sektion {
+                padding: 3px !important; margin-bottom: 3px !important; background: #ffffff !important;
+            }
+            .protokoll-sektion-titel {
+                background: #e6e6e6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
             .kein-druck { display: none !important; }
         }
     </style>
@@ -713,7 +729,7 @@
                 </div>
 
                 <!-- Kopfbereich: Betroffene*r & Einsatz -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Betroffene*r</div>
                         <label>Vorname / Name:</label>
@@ -728,7 +744,7 @@
                                 <input id="fPatientKlasse" type="text" placeholder="Klasse">
                             </div>
                         </div>
-                        <div style="margin-top:4px;">
+                        <div style="margin-top:3px;">
                             <label>Geschlecht:</label>
                             <span class="form-checkbox" data-field="geschlecht" data-val="m"><span class="box-box"></span> m</span>
                             <span class="form-checkbox" data-field="geschlecht" data-val="w"><span class="box-box"></span> w</span>
@@ -749,7 +765,7 @@
                                 <input id="fLfdSchuljahr" type="text" placeholder="Nr. / Jahr">
                             </div>
                         </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:4px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:3px;">
                             <div>
                                 <label>Datum:</label>
                                 <input id="fDatum" type="text" placeholder="TT.MM.JJJJ">
@@ -762,7 +778,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="margin-top:4px;">
+                        <div style="margin-top:3px;">
                             <label>Einsatzort:</label>
                             <span class="form-checkbox" data-field="ortTyp" data-val="raum"><span class="box-box"></span> SSD-Raum</span>
                             <input id="fRaum" type="text" placeholder="Anderer Ort / Raum" style="margin-top:2px;">
@@ -771,16 +787,16 @@
                 </div>
 
                 <!-- Mitte: Anamnese & Messwerte -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 5px; margin-bottom: 5px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 4px; margin-bottom: 4px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Anamnese / Unfallhergang</div>
-                        <textarea id="fMeldebild" rows="3" placeholder="Unfallhergang / Krankengeschichte..."></textarea>
+                        <textarea id="fMeldebild" rows="2" placeholder="Unfallhergang / Krankengeschichte..."></textarea>
                         
-                        <div style="font-size:7.5pt; margin-top:2px; font-weight:700; text-align:center; color:#000;">Körper-Schema (Antippen zum Markieren):</div>
+                        <div style="font-size:7.2pt; margin-top:2px; font-weight:700; text-align:center; color:#000;">Körper-Schema (Antippen zum Markieren):</div>
                         <div class="koerper-container">
                             <!-- Figur 1 (Vorderseite) -->
                             <div class="koerper-figur">
-                                <svg width="55" height="100" viewBox="0 0 100 200">
+                                <svg width="48" height="85" viewBox="0 0 100 200">
                                     <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig1_kopf"/>
                                     <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig1_rumpf"/>
                                     <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig1_l_arm"/>
@@ -788,11 +804,11 @@
                                     <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig1_l_bein"/>
                                     <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig1_r_bein"/>
                                 </svg>
-                                <small style="color:#555; font-size:6.5pt;">Vorderseite</small>
+                                <small style="color:#555; font-size:6pt;">Vorderseite</small>
                             </div>
                             <!-- Figur 2 (Rückseite) -->
                             <div class="koerper-figur">
-                                <svg width="55" height="100" viewBox="0 0 100 200">
+                                <svg width="48" height="85" viewBox="0 0 100 200">
                                     <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig2_kopf"/>
                                     <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig2_ruecken"/>
                                     <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig2_l_arm"/>
@@ -800,7 +816,7 @@
                                     <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig2_l_bein"/>
                                     <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig2_r_bein"/>
                                 </svg>
-                                <small style="color:#555; font-size:6.5pt;">Rückseite</small>
+                                <small style="color:#555; font-size:6pt;">Rückseite</small>
                             </div>
                         </div>
                     </div>
@@ -808,7 +824,7 @@
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Messwerte &amp; Vitalfunktionen</div>
                         
-                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size:7.5pt;">
+                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size:7.2pt;">
                             <div>
                                 <strong>Bewusstsein:</strong><br>
                                 <span class="form-checkbox" data-field="bew_1" data-val="wach"><span class="box-box"></span> wach, orientiert</span><br>
@@ -824,21 +840,21 @@
                             </div>
                         </div>
 
-                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 3px; font-size:7.5pt;">
+                        <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 2px; font-size:7.2pt;">
                             <div>
                                 <label>Puls / Regelmäßigkeit:</label>
-                                <input id="fPuls" type="text" placeholder="Puls /min" style="margin-bottom:2px;">
+                                <input id="fPuls" type="text" placeholder="Puls /min" style="margin-bottom:1px;">
                                 <span class="form-checkbox" data-field="puls_reg" data-val="ja"><span class="box-box"></span> regelm. ja</span>
                                 <span class="form-checkbox" data-field="puls_reg" data-val="nein"><span class="box-box"></span> nein</span>
                             </div>
                             <div>
                                 <label>Blutdruck / Temp:</label>
-                                <input id="fBlutdruck" type="text" placeholder="RR mmHg" style="margin-bottom:2px;">
+                                <input id="fBlutdruck" type="text" placeholder="RR mmHg" style="margin-bottom:1px;">
                                 <input id="fTemperatur" type="text" placeholder="°C Temp">
                             </div>
                         </div>
 
-                        <div style="margin-top:3px; font-size:7.5pt;">
+                        <div style="margin-top:2px; font-size:7.2pt;">
                             <strong>Pupillen:</strong><br>
                             <span class="form-checkbox" data-field="pupillen" data-val="normal"><span class="box-box"></span> normal</span>
                             <span class="form-checkbox" data-field="pupillen" data-val="ungleich"><span class="box-box"></span> ungleich</span>
@@ -846,7 +862,7 @@
                             <span class="form-checkbox" data-field="pupillen" data-val="verkleinert"><span class="box-box"></span> verkleinert</span>
                         </div>
 
-                        <div style="margin-top:3px; font-size:7.5pt;">
+                        <div style="margin-top:2px; font-size:7.2pt;">
                             <strong>Schmerzen (Skala 0-10):</strong>
                             <div style="display:flex; gap:1px; flex-wrap:wrap; margin-top:1px;">
                                 <span class="form-checkbox" data-field="schmerz" data-val="0"><span class="box-box"></span> 0</span>
@@ -866,7 +882,7 @@
                 </div>
 
                 <!-- Maßnahmen & Lagerung -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Maßnahmen</div>
                         <span class="form-checkbox" data-field="massn" data-val="wund"><span class="box-box"></span> Wundversorgung</span>
@@ -875,7 +891,7 @@
                         <span class="form-checkbox" data-field="massn" data-val="waerme"><span class="box-box"></span> Eigenwärmeerhalt</span>
                         <span class="form-checkbox" data-field="massn" data-val="beobachtung"><span class="box-box"></span> Ruhe/Beobachtung</span>
                         <span class="form-checkbox" data-field="massn" data-val="zucker"><span class="box-box"></span> Traubenzucker / Getränke</span>
-                        <textarea id="fMassnahmen" rows="2" placeholder="Weitere Maßnahmen..." style="margin-top:2px;"></textarea>
+                        <textarea id="fMassnahmen" rows="1" placeholder="Weitere Maßnahmen..." style="margin-top:1px;"></textarea>
                     </div>
 
                     <div class="protokoll-sektion" style="margin-bottom:0;">
@@ -890,7 +906,7 @@
                 </div>
 
                 <!-- Weiterversorgung & Verbrauchtes Material -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px;">
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Weiterversorgung &amp; Übergabe</div>
                         <label>Sorgeberechtigte informiert:</label>
@@ -898,12 +914,12 @@
                         <span class="form-checkbox" data-field="eltern" data-val="nicht_erreicht"><span class="box-box"></span> nicht erreicht</span>
                         <input id="fElternUhr" type="text" placeholder="Um Uhrzeit" style="margin-top:1px;">
 
-                        <label style="margin-top:2px;">Übergabe an:</label>
+                        <label style="margin-top:1px;">Übergabe an:</label>
                         <span class="form-checkbox" data-field="uebergabe" data-val="unterricht"><span class="box-box"></span> Unterricht</span>
                         <span class="form-checkbox" data-field="uebergabe" data-val="eltern"><span class="box-box"></span> Sorgeberechtigte</span>
                         <span class="form-checkbox" data-field="uebergabe" data-val="rettungsdienst"><span class="box-box"></span> Rettungsdienst / Notarzt</span>
 
-                        <label style="margin-top:2px;">Transportziel / Verbleib:</label>
+                        <label style="margin-top:1px;">Transportziel / Verbleib:</label>
                         <input id="fVerbleib" type="text" placeholder="Nach Hause / Praxis / Krankenhaus">
 
                         <label style="margin-top:1px;">Zustandsverlauf:</label>
@@ -914,7 +930,7 @@
 
                     <div class="protokoll-sektion" style="margin-bottom:0;">
                         <div class="protokoll-sektion-titel">Verbrauchtes Material &amp; Team</div>
-                        <textarea id="fMaterial" rows="2" placeholder="Verbrauchtes Material..." style="margin-bottom:4px;"></textarea>
+                        <textarea id="fMaterial" rows="1" placeholder="Verbrauchtes Material..." style="margin-bottom:2px;"></textarea>
                         
                         <label>Schulsanitätsteam / Protokollführer*in:</label>
                         <input id="fHelfer" type="text" placeholder="Namen der Sanitäter">
