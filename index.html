@@ -312,12 +312,12 @@
         .form-checkbox.checked .box-box::after { content: "☒"; }
         .form-checkbox:not(.checked) .box-box::after { content: "☐"; opacity: 0.4; }
 
-        /* Körperfiguren-Container */
+        /* Körperfiguren-Container (Vergrößert) */
         .koerper-container {
-            display: flex; justify-content: center; gap: 0.5rem; align-items: center; margin-top: 4px;
+            display: flex; justify-content: center; gap: 0.4rem; align-items: center; margin-top: 4px;
         }
         .koerper-figur {
-            width: 52px; height: 95px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 66px; height: 115px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .koerper-teil {
             cursor: pointer; fill: #dcdcdc; stroke: #333; stroke-width: 0.8; transition: fill 0.15s, transform 0.1s;
@@ -787,16 +787,16 @@
                 </div>
 
                 <!-- Mitte: Anamnese & Messwerte -->
-                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 4px; margin-bottom: 4px;">
+                <div class="grid-mobil-2" style="display:grid; grid-template-columns: 1.1fr 1.1fr; gap: 4px; margin-bottom: 4px;">
                     <div class="protokoll-sektion" style="margin-bottom:0; display:flex; flex-direction:column;">
                         <div class="protokoll-sektion-titel">Anamnese / Unfallhergang</div>
                         <textarea id="fMeldebild" rows="12" placeholder="Unfallhergang / Krankengeschichte..." style="margin-bottom: 4px; flex: 1;"></textarea>
                         
                         <div style="font-size:7.2pt; margin-top:2px; font-weight:700; text-align:center; color:#000;">Körper-Schema (Antippen zum Markieren):</div>
                         <div class="koerper-container">
-                            <!-- Figur 1 (Vorderseite) -->
+                            <!-- Figur 1 (Vorderseite) - Vergrößert -->
                             <div class="koerper-figur">
-                                <svg width="48" height="85" viewBox="0 0 100 200">
+                                <svg width="58" height="102" viewBox="0 0 100 200">
                                     <!-- Kopf -->
                                     <circle cx="50" cy="18" r="14" class="koerper-teil" data-part="fig1_kopf"/>
                                     <!-- Oberkörper & Unterkörper -->
@@ -827,9 +827,9 @@
                                 </svg>
                                 <small style="color:#555; font-size:6pt;">Vorderseite</small>
                             </div>
-                            <!-- Figur 2 (Rückseite) -->
+                            <!-- Figur 2 (Rückseite) - Vergrößert -->
                             <div class="koerper-figur">
-                                <svg width="48" height="85" viewBox="0 0 100 200">
+                                <svg width="58" height="102" viewBox="0 0 100 200">
                                     <!-- Kopf -->
                                     <circle cx="50" cy="18" r="14" class="koerper-teil" data-part="fig2_kopf"/>
                                     <!-- Oberkörper & Unterkörper (Rücken) -->
