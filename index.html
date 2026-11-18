@@ -320,7 +320,7 @@
             width: 52px; height: 95px; position: relative; border: 1px dashed #666; background: #fafafa; border-radius: 3px; padding: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .koerper-teil {
-            cursor: pointer; fill: #dcdcdc; stroke: #333; stroke-width: 1; transition: fill 0.15s, transform 0.1s;
+            cursor: pointer; fill: #dcdcdc; stroke: #333; stroke-width: 0.8; transition: fill 0.15s, transform 0.1s;
         }
         .koerper-teil:active { transform: scale(0.97); }
         .koerper-teil.rot { fill: var(--rot) !important; stroke: #000 !important; }
@@ -797,24 +797,66 @@
                             <!-- Figur 1 (Vorderseite) -->
                             <div class="koerper-figur">
                                 <svg width="48" height="85" viewBox="0 0 100 200">
-                                    <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig1_kopf"/>
-                                    <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig1_rumpf"/>
-                                    <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig1_l_arm"/>
-                                    <path d="M70 41 L83 41 L83 92 L70 92 Z" class="koerper-teil" data-part="fig1_r_arm"/>
-                                    <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig1_l_bein"/>
-                                    <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig1_r_bein"/>
+                                    <!-- Kopf -->
+                                    <circle cx="50" cy="18" r="14" class="koerper-teil" data-part="fig1_kopf"/>
+                                    <!-- Oberkörper & Unterkörper -->
+                                    <path d="M33 34 L67 34 L67 65 L33 65 Z" class="koerper-teil" data-part="fig1_oberkoerper"/>
+                                    <path d="M33 66 L67 66 L67 96 L33 96 Z" class="koerper-teil" data-part="fig1_unterkoerper"/>
+                                    
+                                    <!-- Schulter / Arme Links -->
+                                    <circle cx="24" cy="37" r="5" class="koerper-teil" data-part="fig1_l_schulter"/>
+                                    <path d="M19 44 L30 44 L30 65 L19 65 Z" class="koerper-teil" data-part="fig1_l_oberarm"/>
+                                    <path d="M19 67 L30 67 L30 88 L19 88 Z" class="koerper-teil" data-part="fig1_l_unterarm"/>
+                                    <circle cx="24.5" cy="92" r="3.5" class="koerper-teil" data-part="fig1_l_hand"/>
+
+                                    <!-- Schulter / Arme Rechts -->
+                                    <circle cx="76" cy="37" r="5" class="koerper-teil" data-part="fig1_r_schulter"/>
+                                    <path d="M70 44 L81 44 L81 65 L70 65 Z" class="koerper-teil" data-part="fig1_r_oberarm"/>
+                                    <path d="M70 67 L81 67 L81 88 L70 88 Z" class="koerper-teil" data-part="fig1_r_unterarm"/>
+                                    <circle cx="75.5" cy="92" r="3.5" class="koerper-teil" data-part="fig1_r_hand"/>
+
+                                    <!-- Beine Links -->
+                                    <path d="M35 99 L48 99 L48 138 L35 138 Z" class="koerper-teil" data-part="fig1_l_oberschenkel"/>
+                                    <path d="M35 140 L48 140 L48 178 L35 178 Z" class="koerper-teil" data-part="fig1_l_unterschenkel"/>
+                                    <path d="M32 180 L48 180 L48 188 L30 188 Z" class="koerper-teil" data-part="fig1_l_fuss"/>
+
+                                    <!-- Beine Rechts -->
+                                    <path d="M52 99 L65 99 L65 138 L52 138 Z" class="koerper-teil" data-part="fig1_r_oberschenkel"/>
+                                    <path d="M52 140 L65 140 L65 178 L52 178 Z" class="koerper-teil" data-part="fig1_r_unterschenkel"/>
+                                    <path d="M52 180 L68 180 L70 188 L50 188 Z" class="koerper-teil" data-part="fig1_r_fuss"/>
                                 </svg>
                                 <small style="color:#555; font-size:6pt;">Vorderseite</small>
                             </div>
                             <!-- Figur 2 (Rückseite) -->
                             <div class="koerper-figur">
                                 <svg width="48" height="85" viewBox="0 0 100 200">
-                                    <circle cx="50" cy="20" r="16" class="koerper-teil" data-part="fig2_kopf"/>
-                                    <path d="M33 39 L67 39 L67 96 L33 96 Z" class="koerper-teil" data-part="fig2_ruecken"/>
-                                    <path d="M17 41 L30 41 L30 92 L17 92 Z" class="koerper-teil" data-part="fig2_l_arm"/>
-                                    <path d="M70 41 L83 41 L83 92 L70 92 Z" class="koerper-teil" data-part="fig2_r_arm"/>
-                                    <path d="M35 99 L48 99 L48 185 L35 185 Z" class="koerper-teil" data-part="fig2_l_bein"/>
-                                    <path d="M52 99 L65 99 L65 185 L52 185 Z" class="koerper-teil" data-part="fig2_r_bein"/>
+                                    <!-- Kopf -->
+                                    <circle cx="50" cy="18" r="14" class="koerper-teil" data-part="fig2_kopf"/>
+                                    <!-- Oberkörper & Unterkörper (Rücken) -->
+                                    <path d="M33 34 L67 34 L67 65 L33 65 Z" class="koerper-teil" data-part="fig2_oberkoerper"/>
+                                    <path d="M33 66 L67 66 L67 96 L33 96 Z" class="koerper-teil" data-part="fig2_unterkoerper"/>
+
+                                    <!-- Schulter / Arme Links -->
+                                    <circle cx="24" cy="37" r="5" class="koerper-teil" data-part="fig2_l_schulter"/>
+                                    <path d="M19 44 L30 44 L30 65 L19 65 Z" class="koerper-teil" data-part="fig2_l_oberarm"/>
+                                    <path d="M19 67 L30 67 L30 88 L19 88 Z" class="koerper-teil" data-part="fig2_l_unterarm"/>
+                                    <circle cx="24.5" cy="92" r="3.5" class="koerper-teil" data-part="fig2_l_hand"/>
+
+                                    <!-- Schulter / Arme Rechts -->
+                                    <circle cx="76" cy="37" r="5" class="koerper-teil" data-part="fig2_r_schulter"/>
+                                    <path d="M70 44 L81 44 L81 65 L70 65 Z" class="koerper-teil" data-part="fig2_r_oberarm"/>
+                                    <path d="M70 67 L81 67 L81 88 L70 88 Z" class="koerper-teil" data-part="fig2_r_unterarm"/>
+                                    <circle cx="75.5" cy="92" r="3.5" class="koerper-teil" data-part="fig2_r_hand"/>
+
+                                    <!-- Beine Links -->
+                                    <path d="M35 99 L48 99 L48 138 L35 138 Z" class="koerper-teil" data-part="fig2_l_oberschenkel"/>
+                                    <path d="M35 140 L48 140 L48 178 L35 178 Z" class="koerper-teil" data-part="fig2_l_unterschenkel"/>
+                                    <path d="M32 180 L48 180 L48 188 L30 188 Z" class="koerper-teil" data-part="fig2_l_fuss"/>
+
+                                    <!-- Beine Rechts -->
+                                    <path d="M52 99 L65 99 L65 138 L52 138 Z" class="koerper-teil" data-part="fig2_r_oberschenkel"/>
+                                    <path d="M52 140 L65 140 L65 178 L52 178 Z" class="koerper-teil" data-part="fig2_r_unterschenkel"/>
+                                    <path d="M52 180 L68 180 L70 188 L50 188 Z" class="koerper-teil" data-part="fig2_r_fuss"/>
                                 </svg>
                                 <small style="color:#555; font-size:6pt;">Rückseite</small>
                             </div>
